@@ -123,44 +123,61 @@ foreach t in 2 6{
 				
 			* count of regression ----------------------------------------------
 			
-			mat reg_count[`i', 1] 		= e(N)
-			* P values and stars 
-				local p1 = (2 * ttail(e(df_r), abs(_b[`treat1']/_se[`treat1'])))
-				replace pval1 =  `p1' if _n==`i' 
+			mat reg_count[`i', 1] 		= e(N)  // Saving the value to the observations matrix
+			
+			* P values and stars -----------------------------------------------
+			
+			local p1 = (2 * ttail(e(df_r), abs(_b[`treat1']/_se[`treat1'])))
+			/*
+			Local p1 is not more than taking the inverse normal function in order to find the
+			p value assotiated with a t statistic given in each regression for coefficient `treat1
+			or the effect of the transport subsidy
+			*/
+			
+			quietly replace pval1 =  `p1' if _n==`i' 
+			/*
+			I set this parameter quietly so it does not prints so many lines in the results windows
+			*/
+			mat stars1[`i', 2] = 0 // make the first column of stars 0 for reg1
+			mat stars1[`i', 3] = 0 // make the first column of stars 0 for reg1
 
-				mat stars1[`i', 2] = 0 // make the first column of stars 0
-				mat stars1[`i', 3] = 0 // make the first column of stars 0
+			if (`p1' < .1) 		mat stars1[`i',1] = 1 // less than 10%?
+			else                mat stars1[`i',1] = 0 // if not, no stars
+			if (`p1' < .05) 	mat stars1[`i',1] = 2 // less than 5%?
+			if (`p1' < .01) 	mat stars1[`i',1] = 3 // less than 1%?
+						 
+			local p2= (2 * ttail(e(df_r), abs(_b[`treat2']/_se[`treat2'])))
+			replace pval2 =  `p2' if _n==`i' 
 
-				if (`p1' < .1) 		mat stars1[`i',1] = 1 // less than 10%?
-					else mat stars1[`i',1] = 0 // if not, no stars
-				if (`p1' < .05) 	mat stars1[`i',1] = 2 // less than 5%?
-				if (`p1' < .01) 	mat stars1[`i',1] = 3 // less than 1%?
-				
+			mat stars2[`i', 2] = 0 // make the first column of stars 0 for reg2
+			mat stars2[`i', 3] = 0 // make the first column of stars 0 for reg2
 
-				 
-				local p2= (2 * ttail(e(df_r), abs(_b[`treat2']/_se[`treat2'])))
-				replace pval2 =  `p2' if _n==`i' 
+			if (`p2' < .1) 		mat stars2[`i',1] = 1 // less than 10%?
+			else                mat stars2[`i',1] = 0 // if not, no stars
+			if (`p2' < .05) 	mat stars2[`i',1] = 2 // less than 5%?
+			if (`p2' < .01) 	mat stars2[`i',1] = 3 // less than 1%?
 
-				mat stars2[`i', 2] = 0 // make the first column of stars 0
-				mat stars2[`i', 3] = 0 // make the first column of stars 0
+			* Regression parameter estimates -----------------------------------
+			
+			mat reg1[`i',1] = _b[`treat1']   // Coefficient of transport subsidy
+			mat reg1[`i',2] = _se[`treat1']  // Standar error of Coefficient of transport subsidy
 
-				if (`p2' < .1) 		mat stars2[`i',1] = 1 // less than 10%?
-					else mat stars2[`i',1] = 0 // if not, no stars
-				if (`p2' < .05) 	mat stars2[`i',1] = 2 // less than 5%?
-				if (`p2' < .01) 	mat stars2[`i',1] = 3 // less than 1%?
-
-				* Regression parameter estimates 
-				mat reg1[`i',1] = _b[`treat1']
-				mat reg1[`i',2] = _se[`treat1']
-
-				mat reg2[`i',1] = _b[`treat2']
-				mat reg2[`i',2] = _se[`treat2']
-				
+			mat reg2[`i',1] = _b[`treat2']   // Coefficient of workshop intervention
+			mat reg2[`i',2] = _se[`treat2']  // Standar error of Coefficient of workshop intervention
+			
+			* Linear hypotheses after estimation -------------------------------
+			
 			test  `treat1' = `treat2'   
-			mat cpval[`i',1] = r(p)	
+			/*
+			Test whether estimates are equal. Speciffically if the transport
+			subsidies estimates are equal to the estimate of the workshop intervention in each
+			of the endlines
+			*/
+			
+			mat cpval[`i',1] = r(p)	 // Saving the p value of the test
  
 	
-			local i = `i' + 1 
+			local i = `i' + 1  // Increasing the value of local `i' for the next loop iteration
 		}
 	
 	
