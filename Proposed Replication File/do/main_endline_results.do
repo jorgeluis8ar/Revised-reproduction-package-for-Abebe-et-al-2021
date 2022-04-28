@@ -25,29 +25,28 @@ gen y2015_tg_2 = tg_2*year2015
 
 gen y2018_tg_1 = tg_1*year2018
 gen y2018_tg_2 = tg_2*year2018
+
 foreach x in $balance{
 gen t_i_`x' = `x'*year2015
 
 }  
 
- ******************************************   ***********************************************
+ ****************************************************************************************************
 * This code can be run all at once since the preserve command keeps the dataset in it's original form
 * But it can also be run to the end of this segement, and then each chunk of code between headers (horizontal lines) run separately. 
-*********************************************************************************************
+****************************************************************************************************
 
 
 exit
 
- ****************************************** TABLE 2 ******************************************
+****************************************** TABLE 2 *************************************************
  
 itt_maker_jobstime work hours_worked monthly_wage  permanent_work written_agreement work_satisfaction, treat1(tg_1) treat2(tg_2) ///
 covariates($balance) decimals(3) filename(table2) non cp
 
- *********************************************************************************************
+****************************************************************************************************
 
- 
- 
- ****************************************** TABLE 3 ************************************************
+****************************************** TABLE 3 *************************************************
  preserve
 keep if time ==6
 itt_maker_jobs  monthly_wage_cond longesttenure_cond p2_7 uses_skills promote    , treat1(tg_1) treat2(tg_2) ///
@@ -88,13 +87,19 @@ foreach var of varlist permanent_work written_agreement{
 }
 
 ***************************************************************************************************
-
 * APPENDICES **************************************************************************************
-  
-  
+***************************************************************************************************
+
+
 ****************************************** TABLE A.9 **********************************************
 preserve 
+
 global Covar3 "bs_female bs_respondent_age bs_married bs_live_parents bs_amhara bs_oromo bs_migrant_birth bs_degree bs_years_since_school  bs_work bs_search  bs_work_freq  bs_search_freq bs_work_wage_6months bs_search_6months bs_experience_perm"
+
+/*
+Global `Covar3' takes all the covariates reported in Table A.9. Thus, it resumes the syntax of the regression
+*/
+
 keep if time==2
 gen beyond6km = bs_cent_dist>5.8 if bs_cent_dist!=.
 
@@ -113,15 +118,56 @@ label var bs_female "Female"
 label var bs_respondent_age "Age"
  
 reg transport_takeup_self $Covar3 if treat_groupind == 1, cluster(cluster_id)
+
+/*
+Regression structure:
+			
+The specification to estimate is the following:
+			
+Transport\_take-up_ic = β_0 + δ x X_{ic0} + μ_{ic}
+			
+Where the dependent variable is the dummy variable equal to one if the person took the treatment they were offered. 
+Thus, the estimnated regression is a Linear Probability Model estimated by OLS.
+			
+The elements of the regression are:
+	1. Dependent variable: Dummy variable of treatment take up fr the transport subsidy.
+	2. Regressors: Defined as the covariates in the global `Covar3'
+	3. Sub Sample: The data is subset to only take the people who were assigned to treatment.
+	5. Standar cluster errors: As the randomization of the sample and treatments was done in two steps.
+	   Firstly geographical zones and secondly within zones teatment randomization, the standar errors should
+	   be cluster to allow correlation within geographical zones of individuals. This is done by the option
+	   cluster(cluser_var)
+*/
 est2vec table_a9, replace name(Transport) vars($Covar3 _cons) e(N F)
 local p1 = 1- F(`e(df_m)' ,`e(df_r)' ,`e(F)')
 local p1 : di %4.3f `p1'
 reg workshop_takeup_self $Covar3 if treat_groupind == 2, cluster(cluster_id)
+/*
+Regression structure:
+			
+The specification to estimate is the following:
+			
+Workshop\_take-up_ic = β_0 + δ x X_{ic0} + μ_{ic}
+			
+Where the dependent variable is the dummy variable equal to one if the person took the treatment they were offered. 
+Thus, the estimnated regression is a Linear Probability Model estimated by OLS.
+			
+The elements of the regression are:
+	1. Dependent variable: Dummy variable of treatment take up fr the workshop intervention.
+	2. Regressors: Defined as the covariates in the global `Covar3'
+	3. Sub Sample: The data is subset to only take the people who were assigned to treatment.
+	5. Standar cluster errors: As the randomization of the sample and treatments was done in two steps.
+	   Firstly geographical zones and secondly within zones teatment randomization, the standar errors should
+	   be cluster to allow correlation within geographical zones of individuals. This is done by the option
+	   cluster(cluser_var)
+*/
 est2vec table_a9, addto(table_a9) name(Workshop) 
+* Add the results of regression on workshop intervention to the regression of transport subsidy take up.
 local p2 = 1- F(`e(df_m)' ,`e(df_r)' ,`e(F)')
 local p2 : di %4.3f `p2'
 
-est2tex table_a9, replace path(tables) label  preserve  digit(3) mark(stars)  fancy 
+est2tex table_a9, replace path(tables) label preserve digit(3) mark(stars) fancy 
+* Exporting the final version of the table to .tex format.
 
 display "p value F-test transport take-up " `p1'
 display "p value F-test workshop take-up " `p2'
