@@ -203,7 +203,25 @@ matrix def interquantile2 = J(12,2,.)
 local indicador = 1
 forvalues x =0.4(0.05)1{
 	quietly qreg monthly_wage tg_1 tg_2  bs_monthly_wage  $balance  if time==6  [pw=ed_weight] , quantile(`x')
-	
+	/*
+	Regression structure:
+				
+	The specification to estimate is the following:
+				
+	monthly_wage_ic = β_0 + β_1 x treat\_transport_{fic} + + β_2 x treat\_workshop_{fic} + δ x X_{ic0} + μ_{ic}
+				
+	The comand qreg estimates equation 1 by quantile regression. The quantile of the regressions are defined by `x'
+				
+	The elements of the regression are:
+		1. Dependent variable: Monthly wages in 2018
+		2. Regressors: Defined as the covariates in the global `balance' and treatment branches
+		3. Sub Sample: The data is subset to only take answers for the second endline (6 years after intervention)
+		5. Standar cluster errors: As the randomization of the sample and treatments was done in two steps.
+	       Firstly geographical zones and secondly within zones teatment randomization, the standar errors should
+		   be cluster to allow correlation within geographical zones of individuals. This is done by the option
+		   cluster(cluser_var)
+		6. Quantiles are given by the local `x'
+	*/
 	mat colnames[`indicador',1] = `x'
 	
 	mat interquantile[`indicador',1] = _b[tg_1]
@@ -214,9 +232,6 @@ forvalues x =0.4(0.05)1{
 	
 	local indicador = 1 + `indicador'
 }
-matlist interquantile
-matlist interquantile2
-matlist colnames
 
 frmttable, statmat(colnames) sdec(3) varlabels substat(1)
 frmttable, statmat(interquantile) sdec(3) varlabels merge substat(1)
@@ -230,12 +245,51 @@ frmttable using "tables/table_a12", 	///
 
 ****************************************** TABLE A.13 *********************************************
 
-matrix def interquantile = J(12,3,.)
+matrix def colnames = J(12,2,.)
+matrix def interquantile = J(12,2,.)
+matrix def interquantile2 = J(12,2,.)
+
 local indicador = 1
 forvalues x =0.4(0.05)1{
-	qreg earnings tg_1 tg_2  bs_earnings  $balance  if time==6  [pw=ed_weight] , quantile(`x')
+	quietly qreg earnings tg_1 tg_2 bs_earnings $balance if time==6 [pw=ed_weight], quantile(`x')
+		/*
+	Regression structure:
+				
+	The specification to estimate is the following:
+				
+	earnings_ic = β_0 + β_1 x treat\_transport_{fic} + + β_2 x treat\_workshop_{fic} + δ x X_{ic0} + μ_{ic}
+				
+	The comand qreg estimates equation 1 by quantile regression. The quantile of the regressions are defined by `x'
+				
+	The elements of the regression are:
+		1. Dependent variable: Monthly earnings in 2018
+		2. Regressors: Defined as the covariates in the global `balance' and treatment branches
+		3. Sub Sample: The data is subset to only take answers for the second endline (6 years after intervention)
+		5. Standar cluster errors: As the randomization of the sample and treatments was done in two steps.
+	       Firstly geographical zones and secondly within zones teatment randomization, the standar errors should
+		   be cluster to allow correlation within geographical zones of individuals. This is done by the option
+		   cluster(cluser_var)
+		6. Quantiles are given by the local `x'
+	*/
+	mat colnames[`indicador',1] = `x'
+	
+	mat interquantile[`indicador',1] = _b[tg_1]
+	mat interquantile[`indicador',2] = _se[tg_1]
+
+	mat interquantile2[`indicador',1] = _b[tg_2]
+	mat interquantile2[`indicador',2] = _se[tg_2]	
+	
 	local indicador = 1 + `indicador'
 }
+
+frmttable, statmat(colnames) sdec(3) varlabels substat(1)
+frmttable, statmat(interquantile) sdec(3) varlabels merge substat(1)
+frmttable, statmat(interquantile2) sdec(3) varlabels merge substat(1)
+
+frmttable using "tables/table_a13", 	///
+		tex fragment varlabels nocenter replace ///
+		ctitle("","Quantile", "Transport", "Workshop")
+		
 restore
 
 ***************************************************************************************************
