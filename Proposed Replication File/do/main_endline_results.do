@@ -47,46 +47,52 @@ covariates($balance) decimals(3) filename(table2) non cp
 
  
  
- ****************************************** TABLE 3 ******************************************
+ ****************************************** TABLE 3 ************************************************
  preserve
 keep if time ==6
 itt_maker_jobs  monthly_wage_cond longesttenure_cond p2_7 uses_skills promote    , treat1(tg_1) treat2(tg_2) ///
 covariates($balance) decimals(3) filename(table3)
  restore
-  *********************************************************************************************
+****************************************************************************************************
   
-  *** NOTE: The final rows for Tables 4, 5, and 6 are generated separately in the file "endogenous_stratification.do"
- ****************************************** TABLE 4 ****************************************** 
+*** NOTE: The final rows for Tables 4, 5, and 6 are generated separately in the file "endogenous_stratification.do"
+
+******************************************* TABLE 4 ************************************************
 preserve
 keep if time ==6																						
 ***** 	TO DO: WE HAVE TO APPEND THE FINAL ROW MANUALLY
 itt_maker_het tertiary_ed  male bs_high_intense bs_experience_perm close_centre, outcome(monthly_wage) treat1(tg_1) treat2(tg_2) ///
 covariates($balance) decimals(1) filename(table4) non  cp
 restore
-  *********************************************************************************************
+****************************************************************************************************
 
 
- ****************************************** TABLE 5 ****************************************** 
-preserve 
-keep if time==2
+ ****************************************** TABLE 5 and 6 ****************************************** 
+ 
+local indi = 5
+foreach var of varlist permanent_work written_agreement{
+	
+	dis "*****************************************************"
+	dis "Table `indi'"
+	dis "*****************************************************"
+	
+	preserve 
+	keep if time==2
+	
+	itt_maker_het tertiary_ed  male bs_high_intense bs_experience_perm close_centre, outcome(`var') treat1(tg_1) treat2(tg_2) covariates($balance) ///
+																					 decimals(3) filename(table`indi') non  cp
+	
+	restore
+	
+	local indi = `indi' + 1
+}
 
-itt_maker_het tertiary_ed  male bs_high_intense bs_experience_perm close_centre, outcome(permanent_work) treat1(tg_1) treat2(tg_2) ///
-covariates($balance) decimals(3) filename(table5) non  cp
-restore
- ****************************************** TABLE 6 ****************************************** 
-preserve 
-keep if time==2
-itt_maker_het tertiary_ed  male bs_high_intense bs_experience_perm close_centre, outcome(written_agreement) treat1(tg_1) treat2(tg_2) ///
-covariates($balance) decimals(3) filename(table6) non  cp
+***************************************************************************************************
 
-restore
-  *********************************************************************************************
+* APPENDICES **************************************************************************************
   
   
-
-  **** APPENDICES
-  
-   ****************************************** TABLE A.9 ****************************************** 
+****************************************** TABLE A.9 **********************************************
 preserve 
 global Covar3 "bs_female bs_respondent_age bs_married bs_live_parents bs_amhara bs_oromo bs_migrant_birth bs_degree bs_years_since_school  bs_work bs_search  bs_work_freq  bs_search_freq bs_work_wage_6months bs_search_6months bs_experience_perm"
 keep if time==2
@@ -121,51 +127,68 @@ display "p value F-test transport take-up " `p1'
 display "p value F-test workshop take-up " `p2'
 restore 
 
+***************************************************************************************************
 
   
- ****************************************** TABLE A.10 ****************************************** 
+****************************************** TABLE A.10 *********************************************
 
 itt_maker_jobstime monthly_wage ln_monthly_wage  monthly_wage_w99 monthly_wage_w95 monthly_wage_w90   , treat1(tg_1) treat2(tg_2) ///
 covariates($balance) decimals(3) filename(table_a10) non cp
 
+***************************************************************************************************
 
- ****************************************** TABLE A.11 ****************************************** 
+****************************************** TABLE A.11 *********************************************
 
 itt_maker_jobstime monthly_wage earnings      additive_wages_winsor , treat1(tg_1) treat2(tg_2) ///
 covariates($balance) decimals(3) filename(table_a11) non cp
 
+***************************************************************************************************
 
- ****************************************** TABLE A.12 &  A.13 ****************************************** 
+****************************************** TABLE A.12 &  A.13 *************************************
 preserve 
 keep if time==6
 
-* TABLE A.12 *  
+****************************************** TABLE A.12 *********************************************
 forvalues x =0.4(0.05)1{
 qreg monthly_wage tg_1 tg_2  bs_monthly_wage  $balance  if time==6  [pw=ed_weight] , quantile(`x')
+
 }
-* TABLE A.13 *  
+***************************************************************************************************
+
+****************************************** TABLE A.13 *********************************************
+
 forvalues x =0.4(0.05)1{
 qreg earnings tg_1 tg_2  bs_earnings  $balance  if time==6  [pw=ed_weight] , quantile(`x')
 }
 restore
 
- ****************************************** TABLE A.14 ****************************************** 
+***************************************************************************************************
+
+****************************************** TABLE A.14 *********************************************
+
 *THIS TABLE IS PRODUCED IN THE FILE rdd_a14.do
 
- ****************************************** TABLES A.15-A.23   ****************************************** 
+***************************************************************************************************
+
+****************************************** TABLES A.15-A.23   *************************************
+ 
  *THESE TABLES ARE PRODUCED IN THE FILE  complete_family_tables_a15_a23.do
 
- ****************************************** TABLE A.24 DEMEDIATION DO FILE ****************************************** 
+***************************************************************************************************
 
-	 ****************************************** TABLE A.25   ****************************************** 
+****************************************** TABLE A.24 DEMEDIATION DO FILE *************************
+
+****************************************** TABLE A.25   *******************************************
+
 preserve 
 keep if time ==6
 itt_maker_het tertiary_ed  male bs_high_intense bs_experience_perm close_centre    bornaddis cvcertificate present_bias   bs_network_size , outcome(monthly_wage) treat1(tg_1) treat2(tg_2) ///
 covariates($balance) decimals(1) filename(table_a25) non  cp
 restore
  
+***************************************************************************************************
  
-	 ****************************************** FIGURES 3 AND A.3   ****************************************** 
+****************************************** FIGURES 3 AND A.3   ************************************
 preserve
 keep if time==6
 
@@ -198,6 +221,7 @@ legend (label(1 "Control") label(2 "Transport")) ///
 	
 restore
 
+***************************************************************************************************
 
 local bal_vars vocational work search post_secondary female  migrant_birth amhara oromo work_wage_6months  married  live_parents  experience_perm   search_6months respondent_age years_since_school search_freq work_freq cent_dist cluster_size
 global balance "" 
@@ -260,8 +284,9 @@ over(p1_4, sort(mean_earnings) descending)   ///
 	graph export "figures/figure_a8_`x'.png", replace width(1600) height(1200)
 
 restore
- }
+}
 
+***************************************************************************************************
 
 ******************** FIGURES A.4 AND A.5 ********************
 
