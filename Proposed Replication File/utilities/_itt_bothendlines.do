@@ -181,148 +181,167 @@ foreach t in 2 6{
 		}
 	
 	
-	*** creat q-values 	
+	* Create q-values **********************************************************
+	
 	foreach p in 1 2{
-	preserve 
-	keep pval`p'  `dep_vars'  `regressors'   
- 	
-	keep if pval`p'!=.
-  
+		preserve 
+		
+		keep pval`p' `dep_vars' `regressors'   // Filtering the data set
+		keep if pval`p'!=.                     // Keep those observation that have values of pval1 or pval2 different to missing
 	
-	quietly sum pval`p'
-	local totalpvals = r(N)
-
-	quietly gen int original_sorting_order = _n
-	quietly sort pval`p'
-	quietly gen int rank = _n if pval`p'~=.
+		quietly sum pval`p'
+		local totalpvals = r(N)                // Total number of nonmissing observations with pvalue
 	
-	gen bky06_qval = 1 if pval`p'~=.
-
-	local qval = 1
-
-	
-	while `qval' > 0 {
-	* First Stage
-	* Generate the adjusted first stage q level we are testing: q' = q/1+q
-	local qval_adj = `qval'/(1+`qval')
-	* Generate value q'*r/M
-	gen fdr_temp1 = `qval_adj'*rank/`totalpvals'
-	* Generate binary variable checking condition p(r) <= q'*r/M
-	gen reject_temp1 = (fdr_temp1>=pval`p') if pval`p'~=.
-	* Generate variable containing p-value ranks for all p-values that meet above condition
-	gen reject_rank1 = reject_temp1*rank
-	* Record the rank of the largest p-value that meets above condition
-	egen total_rejected1 = max(reject_rank1)
-
-	* Second Stage
-	* Generate the second stage q level that accounts for hypotheses rejected in first stage: q_2st = q'*(M/m0)
-	local qval_2st = `qval_adj'*(`totalpvals'/(`totalpvals'-total_rejected1[1]))
-	* Generate value q_2st*r/M
-	gen fdr_temp2 = `qval_2st'*rank/`totalpvals'
-	* Generate binary variable checking condition p(r) <= q_2st*r/M
-	gen reject_temp2 = (fdr_temp2>=pval`p') if pval`p'~=.
-	* Generate variable containing p-value ranks for all p-values that meet above condition
-	gen reject_rank2 = reject_temp2*rank
-	* Record the rank of the largest p-value that meets above condition
-	egen total_rejected2 = max(reject_rank2)
-
-	* A p-value has been rejected at level q if its rank is less than or equal to the rank of the max p-value that meets the above condition
-	quietly replace bky06_qval = `qval' if rank <= total_rejected2 & rank~=.
-	* Reduce q by 0.001 and repeat loop
-	drop fdr_temp* reject_temp* reject_rank* total_rejected*
-	local qval = `qval' - .001
-	}
+		quietly gen int original_sorting_order = _n
+		quietly sort pval`p'
+		quietly gen int rank = _n if pval`p'~=.
+		
+		quietly gen bky06_qval = 1 if pval`p'~=.
 	
 		local qval = 1
-	gen bh95_qval = 1 if pval~=.
-
-	while `qval' > 0 {
-	* Generate value qr/M
-	quietly gen fdr_temp = `qval'*rank/`totalpvals'
-	* Generate binary variable checking condition p(r) <= qr/M
-	quietly gen reject_temp = (fdr_temp>=pval) if fdr_temp~=.
-	* Generate variable containing p-value ranks for all p-values that meet above condition
-	quietly gen reject_rank = reject_temp*rank
-	* Record the rank of the largest p-value that meets above condition
-	quietly egen total_rejected = max(reject_rank)
-	* A p-value has been rejected at level q if its rank is less than or equal to the rank of the max p-value that meets the above condition
-	quietly replace bh95_qval = `qval' if rank <= total_rejected & rank~=.
-	* Reduce q by 0.001 and repeat loop
-	quietly drop fdr_temp reject_temp reject_rank total_rejected
-	local qval = `qval' - .001
-}
-
-
-	quietly sort original_sorting_order
+		while `qval' > 0 {
+		
+			* First Stage ------------------------------------------------------
+			
+			* Generate the adjusted first stage q level we are testing: q' = q/1+q
+			local qval_adj = `qval'/(1+`qval')
+			
+			* Generate value q'*r/M
+			gen fdr_temp1 = `qval_adj'*rank/`totalpvals'
+			
+			* Generate binary variable checking condition p(r) <= q'*r/M
+			gen reject_temp1 = (fdr_temp1>=pval`p') if pval`p'~=.
+			
+			* Generate variable containing p-value ranks for all p-values that meet above condition
+			gen reject_rank1 = reject_temp1*rank
+			
+			* Record the rank of the largest p-value that meets above condition
+			egen total_rejected1 = max(reject_rank1)
 	
-	local m = 1
-	display "`totalpvals'"
-	while `m' <= `totalpvals'{
-	local pos = `m'  
-	mat reg`p'[`pos',3] = bky06_qval[`m']
-*	mat qvals[`pos',1] = bh95_qval[`m']
-
-	local m = `m'+1 
-	}
-	restore
+			* Second Stage -----------------------------------------------------
+			
+			* Generate the second stage q level that accounts for hypotheses rejected in first stage: q_2st = q'*(M/m0)
+			local qval_2st = `qval_adj'*(`totalpvals'/(`totalpvals'-total_rejected1[1]))
+			
+			* Generate value q_2st*r/M
+			gen fdr_temp2 = `qval_2st'*rank/`totalpvals'
+			
+			* Generate binary variable checking condition p(r) <= q_2st*r/M
+			gen reject_temp2 = (fdr_temp2>=pval`p') if pval`p'~=.
+			
+			* Generate variable containing p-value ranks for all p-values that meet above condition
+			gen reject_rank2 = reject_temp2*rank
+			
+			* Record the rank of the largest p-value that meets above condition
+			egen total_rejected2 = max(reject_rank2)
+	
+			* A p-value has been rejected at level q if its rank is less than or equal to the rank of the max p-value that meets the above condition
+			quietly replace bky06_qval = `qval' if rank <= total_rejected2 & rank~=.
+			
+			* Reduce q by 0.001 and repeat loop
+			drop fdr_temp* reject_temp* reject_rank* total_rejected*
+			
+			local qval = `qval' - .001
+		}
+		
+		local qval = 1
+		gen bh95_qval = 1 if pval~=.
+	
+		while `qval' > 0 {
+		
+			* Generate value qr/M
+			quietly gen fdr_temp = `qval'*rank/`totalpvals'
+			
+			* Generate binary variable checking condition p(r) <= qr/M
+			quietly gen reject_temp = (fdr_temp>=pval) if fdr_temp~=.
+			
+			* Generate variable containing p-value ranks for all p-values that meet above condition
+			quietly gen reject_rank = reject_temp*rank
+			
+			* Record the rank of the largest p-value that meets above condition
+			quietly egen total_rejected = max(reject_rank)
+			
+			* A p-value has been rejected at level q if its rank is less than or equal to the rank of the max p-value that meets the above condition
+			quietly replace bh95_qval = `qval' if rank <= total_rejected & rank~=.
+			
+			* Reduce q by 0.001 and repeat loop
+			quietly drop fdr_temp reject_temp reject_rank total_rejected
+			
+			local qval = `qval' - .001
+		}
+		
+		quietly sort original_sorting_order
+		
+		local m = 1
+		display "`totalpvals'"
+		while `m' <= `totalpvals'{
+		
+			local pos = `m'  
+			
+			mat reg`p'[`pos',3] = bky06_qval[`m']
+		*	mat qvals[`pos',1] = bh95_qval[`m']
+	
+			local m = `m'+1 
+		}
+		restore
 	}
 
 	local dec 3
 		* Merge matrices together to form larger matrix
 		frmttable, statmat(control_mean)  sdec(3\3\3 \ 3\3\3 \ 3\3\3  ) varlabels substat(2) `merge'
 		if "`non'"!="non"{
-		frmttable, statmat(reg_count) sdec(0) varlabels substat(2)  merge 
-		}
-		frmttable, statmat(reg1) sdec(3\3\3 \ 3\3\3 \ 3\3\3  ) annotate(stars1) asymbol(*,**,***) varlabels merge substat(2)
-		frmttable, statmat(reg2)  sdec(3\3\3 \ 3\3\3 \ 3\3\3  ) annotate(stars2) asymbol(*,**,***) varlabels merge substat(2)
+			frmttable, statmat(reg_count) sdec(0) varlabels substat(2)  merge 
+			}
+			frmttable, statmat(reg1) sdec(3\3\3 \ 3\3\3 \ 3\3\3  ) annotate(stars1) asymbol(*,**,***) varlabels merge substat(2)
+			frmttable, statmat(reg2)  sdec(3\3\3 \ 3\3\3 \ 3\3\3  ) annotate(stars2) asymbol(*,**,***) varlabels merge substat(2)
 		if "`cp'"=="cp"{
-		 frmttable, statmat(cpval)   varlabels merge substat(2)
+			frmttable, statmat(cpval)   varlabels merge substat(2)
 		}
 		local merge merge
 }
 		
 		if "`non'"!="non"{
-		frmttable using "tables/`filename'", 	///
-		tex ///
-		fragment ///
-		varlabels ///
-		nocenter ///
-		replace ///
-		ctitle("", "2015", "", "", "", "2018", "", "", ""\ ///
-		"\cmidrule(lr){2-5}\cmidrule(lr){6-9}", "Control", "", "{Transport}", "{Workshop}", "Control", "", "{Transport}", "{Workshop}"\ ///
-		"Outcome", "mean", "N", "", "","mean", "N", \ ///
-		"", "(1)", "(2)", "(3)", "(4)", "(5)", "(6)", "(7)", "(8)") ///
-		multicol(1,2,4;1,6,4) 
+			frmttable using "tables/`filename'", 	///
+			tex ///
+			fragment ///
+			varlabels ///
+			nocenter ///
+			replace ///
+			ctitle("", "2015", "", "", "", "2018", "", "", ""\ ///
+			"\cmidrule(lr){2-5}\cmidrule(lr){6-9}", "Control", "", "{Transport}", "{Workshop}", "Control", "", "{Transport}", "{Workshop}"\ ///
+			"Outcome", "mean", "N", "", "","mean", "N", \ ///
+			"", "(1)", "(2)", "(3)", "(4)", "(5)", "(6)", "(7)", "(8)") ///
+			multicol(1,2,4;1,6,4) 
 		}
 		else{
 		if "`cp'"!="cp"{
-		frmttable using "tables/`filename'_non", 	///
-		tex ///
-		fragment ///
-		varlabels ///
-		nocenter ///
-		replace ///
-		ctitle("", "2015", "", "",  "2018", "", "", ""\ ///
-		"\cmidrule(lr){2-4}\cmidrule(lr){5-7}", "Control", "{Transport}", "{Workshop}", "Control",  "{Transport}", "{Workshop}"\ ///
-		"Outcome", "mean", "", "", "mean" \ ///
-		"", "(1)", "(2)", "(3)", "(4)", "(5)", "(6)") ///
-		multicol(1,2,3;1,5,3) 
+			frmttable using "tables/`filename'_non", 	///
+			tex ///
+			fragment ///
+			varlabels ///
+			nocenter ///
+			replace ///
+			ctitle("", "2015", "", "",  "2018", "", "", ""\ ///
+			"\cmidrule(lr){2-4}\cmidrule(lr){5-7}", "Control", "{Transport}", "{Workshop}", "Control",  "{Transport}", "{Workshop}"\ ///
+			"Outcome", "mean", "", "", "mean" \ ///
+			"", "(1)", "(2)", "(3)", "(4)", "(5)", "(6)") ///
+			multicol(1,2,3;1,5,3) 
 		}
 		else{
-		*append one more row
- 		frmttable using "tables/`filename'", 	///
-		tex ///
-		fragment ///
-		varlabels ///
-		nocenter ///
-		replace ///
-		ctitle("", "2015", "","", "",  "2018", "", "", "",""\ ///
-		"\cmidrule(lr){2-5}\cmidrule(lr){6-9}", "Control", "{Transport}", "{Workshop}","{Equality}", "Control",  "{Transport}", "{Workshop}" ,"{Equality}"\ ///
-		"Outcome", "mean", "", "", "(pval)", "mean", "", "", "(pval)" \ ///
-		"", "(1)", "(2)", "(3)", "(4)", "(5)", "(6)", "(7)", "(8)") ///
-		multicol(1,2,4;1,6,4) 
-		
-		}
+			*append one more row
+			frmttable using "tables/`filename'", 	///
+			tex ///
+			fragment ///
+			varlabels ///
+			nocenter ///
+			replace ///
+			ctitle("", "2015", "","", "",  "2018", "", "", "",""\ ///
+			"\cmidrule(lr){2-5}\cmidrule(lr){6-9}", "Control", "{Transport}", "{Workshop}","{Equality}", "Control",  "{Transport}", "{Workshop}" ,"{Equality}"\ ///
+			"Outcome", "mean", "", "", "(pval)", "mean", "", "", "(pval)" \ ///
+			"", "(1)", "(2)", "(3)", "(4)", "(5)", "(6)", "(7)", "(8)") ///
+			multicol(1,2,4;1,6,4) 
+
+			}
 		}
 		
 		display "end"
