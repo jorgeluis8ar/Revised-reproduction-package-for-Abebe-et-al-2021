@@ -183,50 +183,69 @@ program define itt_maker_het, rclass
 			
 			* P values and stars  ----------------------------------------------
 			
-				local p1 = (2 * ttail(e(df_r), abs(_b[`treat1'_h_`h']/_se[`treat1'_h_`h'])))
-				/*
-				Local p1 is not more than takinf the inverse normal function in order to find the
-				p value assotiated with a t statistic given in each regression for coefficient
-				`treat1'_h_`h'
-				*/
-				quiet replace pval1 =  `p1' if _n==`i'
-				/*
-				I set this parameter quietly so it does not prints so many lines in the results windows
-				*/
-
-				mat stars1[`i', 2] = 0 // make the first column of stars 0
-				mat stars1[`i', 3] = 0 // make the first column of stars 0
-
-				if (`p1' < .1) 		mat stars1[`i',1] = 1 // less than 10%?
-					else mat stars1[`i',1] = 0 // if not, no stars
-				if (`p1' < .05) 	mat stars1[`i',1] = 2 // less than 5%?
-				if (`p1' < .01) 	mat stars1[`i',1] = 3 // less than 1%?
+			local p1 = (2 * ttail(e(df_r), abs(_b[`treat1'_h_`h']/_se[`treat1'_h_`h'])))
+			/*
+			Local p1 is not more than takinf the inverse normal function in order to find the
+			p value assotiated with a t statistic given in each regression for coefficient
+			`treat1'_h_`h'
+			*/
+			quiet replace pval1 =  `p1' if _n==`i'
 			
-				local p2= (2 * ttail(e(df_r), abs(_b[`treat2'_h_`h']/_se[`treat2'_h_`h'])))
-				replace pval2 =  `p2' if _n==`i' 
+			/*
+			I set this parameter quietly so it does not prints so many lines in the results windows
+			*/
 
-				mat stars2[`i', 2] = 0 // make the first column of stars 0
-				mat stars2[`i', 3] = 0 // make the first column of stars 0
+			mat stars1[`i', 2] = 0 // make the first column of stars 0
+			mat stars1[`i', 3] = 0 // make the first column of stars 0
 
-				if (`p2' < .1) 		mat stars2[`i',1] = 1 // less than 10%?
-					else mat stars2[`i',1] = 0 // if not, no stars
-				if (`p2' < .05) 	mat stars2[`i',1] = 2 // less than 5%?
-				if (`p2' < .01) 	mat stars2[`i',1] = 3 // less than 1%?
+			if (`p1' < .1) 		mat stars1[`i',1] = 1 // less than 10%?
+			else 				mat stars1[`i',1] = 0 // if not, no stars
+			if (`p1' < .05) 	mat stars1[`i',1] = 2 // less than 5%?
+			if (`p1' < .01) 	mat stars1[`i',1] = 3 // less than 1%?
+		
+			local p2= (2 * ttail(e(df_r), abs(_b[`treat2'_h_`h']/_se[`treat2'_h_`h'])))
+			* Local for pvalu associated with the workshop intervention
+			
+			quiet replace pval2 =  `p2' if _n==`i' 
+			/*
+			I set this parameter quietly so it does not prints so many lines in the results windows
+			*/
 
-				* Regression parameter estimates 
-				mat reg1[`i',1] = _b[`treat1'_h_`h']
-				mat reg1[`i',2] = _se[`treat1'_h_`h']
+			mat stars2[`i', 2] = 0 // make the first column of stars 0
+			mat stars2[`i', 3] = 0 // make the first column of stars 0
 
-				mat reg2[`i',1] = _b[`treat2'_h_`h']
-				mat reg2[`i',2] = _se[`treat2'_h_`h']
+			if (`p2' < .1) 		mat stars2[`i',1] = 1 // less than 10%?
+			else                mat stars2[`i',1] = 0 // if not, no stars
+			if (`p2' < .05) 	mat stars2[`i',1] = 2 // less than 5%?
+			if (`p2' < .01) 	mat stars2[`i',1] = 3 // less than 1%?
+
+			* Regression parameter estimates -----------------------------------
+			
+			mat reg1[`i',1] = _b[`treat1'_h_`h']
+			mat reg1[`i',2] = _se[`treat1'_h_`h']
+
+			mat reg2[`i',1] = _b[`treat2'_h_`h']
+			mat reg2[`i',2] = _se[`treat2'_h_`h']
 				
+			* Linear hypotheses after estimation -------------------------------
+			
 			test  `treat1'_h_0 = `treat1'_h_1
-			mat cpval[`i',1] = r(p)	
+			/*
+			Test whether estimates are equal. Speciffically if the transport
+			subsidies estimates are equal when each of the baseline variables
+			are either 0 or 1
+			*/
+			mat cpval[`i',1] = r(p)	// Saving the p value of the t test.
 			
 			test  `treat2'_h_0 = `treat2'_h_1
-			mat cpval[`i',4] = r(p)	
+			/*
+			Test whether estimates are equal. Speciffically if the workshop
+			intervention estimates are equal when each of the baseline variables
+			are either 0 or 1
+			*/
+			mat cpval[`i',4] = r(p)	// Saving the p value of the t test.
 	
-			local i = `i' + 1 
+			local i = `i' + 1 // Increasing the value of local `i' for the next loop iteration
 		}
 	 
 		
