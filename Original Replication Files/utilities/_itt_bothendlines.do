@@ -5,7 +5,7 @@
 
 	cap program drop itt_maker_jobstime
 	program define itt_maker_jobstime, rclass
-		syntax varlist, TREAT1(varlist) TREAT2(varlist)   COVARIATES(varlist) FILENAME(name) DECIMALS(integer)  [NON] [CP]
+		syntax varlist, TREAT1(varlist) TREAT2(varlist) COVARIATES(varlist) FILENAME(name) DECIMALS(integer)  [NON] [CP]
 		/* 
 			* varlist: local of dependent variables 
 			* treat1: the first binary treatment we are interest in
