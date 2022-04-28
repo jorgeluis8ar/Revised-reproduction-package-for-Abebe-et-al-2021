@@ -1,5 +1,5 @@
 
-	
+* Commented by: Jorge Luis Ochoa Rincón
 
 ********************************************************************************
 * Define a program to make ITT tables ******************************************
@@ -7,8 +7,8 @@
 
 /*
 
-The program defines tge results for Table 3 of the document. Speciffically, the table
-reports the intent/to/treatment estimates of the impact of the transport intervention
+The program defines the results for Table 3 of the document. Speciffically, the table
+reports the Intent To Treatment (ITT) estimates of the impact of the transport intervention
 and the job application workshop on several outcomes realated to match quality.
 
 Regressions estimated are obtained by OLS of the following equation>
@@ -33,7 +33,18 @@ Columns:
 2. Number of observations used in the regression model.
 3. Coefficient of the transport intervention
 4. Coefficient of the workshop intervention
-5. P value of a difference in means t test.
+5. P value of a linear hypotheses for equal estimates (are effects from the transport
+subsides equal to the effects of the workshop intervention?).
+
+The program runs all the following steps:
+
+1. Definition of locals.
+2. Definition of matrices. This matrices will be used to create a unique matrix with all results
+3. Matrices rownames and colnames are assigned.
+4. In order to fill in the matrices, a loop goes through every dependent variable 
+and fills in the corresponding value in each of the seven matrices. Matrices stars are
+used to give the legend of statistical significance in the document.
+5. Lastly, all the matrices are merged and the finall matrix is given the right format.
 
 */
 
@@ -149,65 +160,80 @@ program define itt_maker_jobs, rclass
 				be cluster to allow correlation within geographical zones of individuals. This is done by the option
 				cluster(cluser_var)
 			
+			I eliminated two lines that were repeated below
 			*/
 			
-			local p1 = (2 * ttail(e(df_r), abs(_b[`treat1']/_se[`treat1']))) 	// calculate p value for treatment 1
-			local p2 = (2 * ttail(e(df_r), abs(_b[`treat2']/_se[`treat2'])))	// calculate p value for treatment 2
-
-			qui sum `y' if (treat_groupind == 5 ) [aw=ed_weight]  // define the control group
+			qui sum `y' if (treat_groupind == 5 ) [aw=ed_weight] 
+			
+			/*
+			Defining the control mean for each variable using inverse frequency weights in the sample
+			*/
 	
 			* inputting values into the matrix piece by piece ******************
 
-			* control mean
-			mat control_mean[`i', 1] 	= r(mean)
+			* control mean -----------------------------------------------------
+			
+			mat control_mean[`i', 1] 	= r(mean) // Saving the value to the mean matrix
 
-			* count of regression
-			mat reg_count[`i', 1] 		= e(N)
+			* count of regression ----------------------------------------------
+			
+			mat reg_count[`i', 1] 		= e(N)    // Saving the value to the observations matrix
 
-			* P values and stars 
-				local p1 = (2 * ttail(e(df_r), abs(_b[`treat1']/_se[`treat1'])))
-				
-				mat stars1[`i', 2] = 0 // make the first column of stars 0
-				if (`p1' < .1) 		mat stars1[`i',1] = 1 // less than 10%?
-					else mat stars1[`i',1] = 0 // if not, no stars
-				if (`p1' < .05) 	mat stars1[`i',1] = 2 // less than 5%?
-				if (`p1' < .01) 	mat stars1[`i',1] = 3 // less than 1%?
-				
-				 
-				local p2= (2 * ttail(e(df_r), abs(_b[`treat2']/_se[`treat2'])))
-	
-				mat stars2[`i', 2] = 0 // make the first column of stars 0
-				if (`p2' < .1) 		mat stars2[`i',1] = 1 // less than 10%?
-					else mat stars2[`i',1] = 0 // if not, no stars
-				if (`p2' < .05) 	mat stars2[`i',1] = 2 // less than 5%?
-				if (`p2' < .01) 	mat stars2[`i',1] = 3 // less than 1%?
+			* P values and stars -----------------------------------------------
+			
+			local p1 = (2 * ttail(e(df_r), abs(_b[`treat1']/_se[`treat1'])))
+			
+			mat stars1[`i', 2] = 0                    // make the first column of stars 0
+			if (`p1' < .1) 		mat stars1[`i',1] = 1 // less than 10%?
+				else mat stars1[`i',1] = 0            // if not, no stars
+			if (`p1' < .05) 	mat stars1[`i',1] = 2 // less than 5%?
+			if (`p1' < .01) 	mat stars1[`i',1] = 3 // less than 1%?
+			
+			 
+			local p2= (2 * ttail(e(df_r), abs(_b[`treat2']/_se[`treat2'])))
 
-				* Regression parameter estimates 
-				mat reg1[`i',1] = _b[`treat1']
-				mat reg1[`i',2] = _se[`treat1']
+			mat stars2[`i', 2] = 0                    // make the first column of stars 0
+			if (`p2' < .1) 		mat stars2[`i',1] = 1 // less than 10%?
+				else mat stars2[`i',1] = 0            // if not, no stars
+			if (`p2' < .05) 	mat stars2[`i',1] = 2 // less than 5%?
+			if (`p2' < .01) 	mat stars2[`i',1] = 3 // less than 1%?
 
-				mat reg2[`i',1] = _b[`treat2']
-				mat reg2[`i',2] = _se[`treat2']
-				
-				test  `treat1' = `treat2'   
-				mat cpval[`i',1] = r(p)		
-				*test 
-				*mat reg2[`i',1] = _b[`treat2']
-				*mat reg2[`i',2] = _se[`treat2']
- 
+			* Regression parameter estimates -----------------------------------
+			
+			mat reg1[`i',1] = _b[`treat1']   // Accessing transport subsides estimate
+			mat reg1[`i',2] = _se[`treat1']  // Accessing transport subsides estimate stan. error
+
+			mat reg2[`i',1] = _b[`treat2']   // Accessing workshop intervention estimate
+			mat reg2[`i',2] = _se[`treat2']  // Accessing workshop intervention estimate stan. error
+			
+			* Linear hypotheses after estimation -------------------------------
+			
+			test  `treat1' = `treat2'   // Test whether estimates are equal
+			mat cpval[`i',1] = r(p)		// Saving the p value of the t test.
+
 	
 			local i = `i' + 1   // increasing the local `i' value for the next row in all matrices
 		}
 	
 	
 		* Merge matrices together to form larger matrix
+		
+		/*
+		Each of the five generated matrices are merged together to form a unique matrix. Because Matrices 
+		have two columns, the second column is used as second row for each variable.
+		*/
+		
 		frmttable, statmat(control_mean) sdec(`dec') varlabels substat(1)
-				frmttable, statmat(reg_count) sdec(0) varlabels merge   substat(1)
+		frmttable, statmat(reg_count) sdec(0) varlabels merge substat(1)
 		frmttable, statmat(reg1) sdec(`dec') annotate(stars1) asymbol(*,**,***) varlabels merge substat(1)
 		frmttable, statmat(reg2) sdec(`dec') annotate(stars2) asymbol(*,**,***) varlabels merge substat(1)
- 		frmttable, statmat(cpval) sdec(3)   varlabels merge  substat(1)
+ 		frmttable, statmat(cpval) sdec(3) varlabels merge substat(1)
  
-
+		/*
+		Lastly, the table is stored with filename of local `filename'. Is it save within the
+		folders of the replication files. File is saved in .tex format.
+		*/
+		
 		frmttable using "tables/`filename'", 	///
 		tex ///
 		fragment ///
