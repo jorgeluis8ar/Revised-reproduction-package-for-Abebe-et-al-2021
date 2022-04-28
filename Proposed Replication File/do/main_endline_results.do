@@ -368,6 +368,7 @@ gen control= treat_groupind==5
 
 
 *here we rank occupations by their 2018 average earnings and impute that back to 2015 occupational categories.
+
 gen occ_2015a = occupation if time==2
 egen occ_2015 = max(occ_2015a),by(r_id)
 replace occ_2015=. if time!=6
@@ -379,44 +380,47 @@ egen mean_earnings_all=  max(mean_earnings), by(occ_2015)
 egen all_n1 = count(p1_4) ,by(p1_4)
 
 foreach x in 1 2{
-preserve 
-keep if time ==2
-keep p1_4  control mean_earnings_all time tg_1 tg_2 all_n1
-keep if control==1|tg_`x'==1
-gen n = 1
-
-collapse (first) mean_earnings all_n1 (count) n   , by( p1_4 control )
-drop if p1_4==.
-
-egen all_n = total(n) ,by(p1_4)
-
-egen all_treat = total(n) , by(control)
-gen double n_frac= n/all_treat
-drop if all_n1<6
-drop if all_n1<20
-*drop "other"
-drop if p1_4==37
-
-keep n_frac p1_4  all_n   mean_earnings   control
-reshape wide n_frac , i(p1_4) j(control)
-
-recode n_frac0 n_frac1   (.=0)
-
-sort n_frac1
-label variable n_frac0 "Transport"
-if `x'==2{
-label variable n_frac0 "Workshop"
-
-}
-label variable n_frac1 "Control"
- 
-
-graph hbar (asis) n_frac0 n_frac1  , ///
-over(p1_4, sort(mean_earnings) descending)   ///
- plotregion(fcolor(white) lcolor(white)) graphregion(fcolor(white) lcolor(white)) legend( cols(3)  position(6)) scheme(538w)
+	
+	preserve 
+	
+	keep if time == 2
+	keep p1_4 control mean_earnings_all time tg_1 tg_2 all_n1
+	keep if control==1|tg_`x'==1
+	gen n = 1
+	
+	collapse (first) mean_earnings all_n1 (count) n   , by( p1_4 control )
+	/*
+	Agreggating data over the employment codes and control treatment status.
+	The collapse command counts the obervations and gets the mean of earnings.
+	*/
+	
+	drop if p1_4==.
+		egen all_n = total(n) ,by(p1_4)
+	
+	egen all_treat = total(n), by(control)
+	gen double n_frac= n/all_treat
+	drop if all_n1<6
+	drop if all_n1<20
+	drop if p1_4==37
+	
+	keep n_frac p1_4  all_n   mean_earnings   control
+	reshape wide n_frac , i(p1_4) j(control)
+	
+	recode n_frac0 n_frac1   (.=0)
+	
+	sort n_frac1
+	label variable n_frac0 "Transport"
+	if `x'==2{
+		label variable n_frac0 "Workshop"
+	}
+	label variable n_frac1 "Control"
+	
+	graph hbar (asis) n_frac0 n_frac1  , ///
+	over(p1_4, sort(mean_earnings) descending)   ///
+	plotregion(fcolor(white) lcolor(white)) graphregion(fcolor(white) lcolor(white)) legend( cols(3)  position(6)) scheme(538w)
 	graph export "figures/figure_a8_`x'.png", replace width(1600) height(1200)
-
-restore
+	
+	restore
 }
 
 ***************************************************************************************************
@@ -424,6 +428,7 @@ restore
 ******************** FIGURES A.4 AND A.5 ********************
 
 *append recall data which constructs employment rates by year for the intervening years before the first and second endline. 
+
 append using  data/recall.dta
 gen timeplot =. 
 gen treatment = . 

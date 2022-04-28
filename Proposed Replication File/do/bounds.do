@@ -14,12 +14,33 @@ foreach x in  `bal_vars'{
 use "data/attrition_bounds.dta",clear 
 
 *Predictors of attrition (Table A.8)
- reg  attritted tg_1 tg_2    if time==2 ,cluster(cluster_id)
- reg  attritted tg_1 tg_2  $balance  if time==2 ,cluster(cluster_id)
- reg  attritted tg_1 tg_2  if time==6 ,cluster(cluster_id)
- reg  attritted tg_1 tg_2  $balance  if time==6 ,cluster(cluster_id)
+
+/*
+The following regressions provide evidence on attrition of individuals. The key variables of
+interest are the dummy variables of treatment branch. The first and third regressions are estimated
+using the following equation:
+
+attrition_ic = β_0 + β_1 transport_ic + β_2 Workshop_ic +  μ_{ic}
+
+Regressions 2 and 4 are estimated using a set of controls
+
+attrition_ic = β_0 + β_1 transport_ic + β_2 Workshop_ic +  δ x X_{ic0} + μ_{ic}
+
+The elements of the regression are:
+	1. Dependent variable: Dummy variable identifying if individual i takes the follow up survey
+	2. Regressors: Defined as the dummy treatment variables for both brances and a vector of controls
+	3. Standard cluster errors: As the randomization of the sample and treatments was done in two steps.
+	   Firstly geographical zones and secondly within zones teatment randomization, the standar errors 
+	4. Subsample: Regressions 1 and 2 assess the predictors of attrition in the first endline, while equations
+	    3 and 4 assess the predictors of attrition in the second endline.
+*/
+reg  attritted tg_1 tg_2            if time==2 ,cluster(cluster_id)
+reg  attritted tg_1 tg_2  $balance  if time==2 ,cluster(cluster_id)
+reg  attritted tg_1 tg_2            if time==6 ,cluster(cluster_id)
+reg  attritted tg_1 tg_2  $balance  if time==6 ,cluster(cluster_id)
 
 keep if time ==6 
+
 * 1) EARNINGS UPPER BOUND FOR 2018  (Table A.28)
 reg monthly_wage $balance  if control==1
 predict predict_wage 
@@ -73,7 +94,7 @@ label var monthly_wage_pred_se50 "Predicted earnings +/- 0.5 SDs"
 label var monthly_wage_imp25_gened "Mean control earnings +/- 0.25 SDs" 
 label var monthly_wage_imp50_gened "Mean control earnings +/- 0.5 SDs" 
 label var monthly_wage_imp95 "95th / 5th percentile" 
- label var monthly_wage_manski "Max/min" 
+label var monthly_wage_manski "Max/min" 
 
   itt_maker_onetreat  monthly_wage_pred  monthly_wage_pred_se25 monthly_wage_pred_se50  ///
  monthly_wage_imp25_gened monthly_wage_imp50_gened monthly_wage_imp95   monthly_wage_manski, treat(tg_2)  ///
