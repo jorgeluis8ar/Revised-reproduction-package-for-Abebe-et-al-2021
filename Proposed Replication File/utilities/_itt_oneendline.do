@@ -27,40 +27,52 @@ Rows:
 4. Dummy variable if individual uses skills acquired in previous jobs or school.
 5. Dummy variable if individual has been promoted its current job.
 
+Columns:
+
+1. Control mean of each of the independent variables in local `varlist'.
+2. Number of observations used in the regression model.
+3. Coefficient of the transport intervention
+4. Coefficient of the workshop intervention
+5. P value of a difference in means t test.
+
 */
 
 cap program drop itt_maker_jobs
-	program define itt_maker_jobs, rclass
-		syntax varlist, TREAT1(varlist) TREAT2(varlist)   COVARIATES(varlist) FILENAME(name) DECIMALS(integer) 
+program define itt_maker_jobs, rclass
+	syntax varlist, TREAT1(varlist) TREAT2(varlist) COVARIATES(varlist) FILENAME(name) DECIMALS(integer) 
 		/* 
-			* varlist: local of dependent variables 
-			* treat1: the first binary treatment we are interest in
-			* treat2: the second binary treatment we are interest in
-			* covariates: local of control variables 
+			* varlist: local of dependent variables --> One can acces this local by `varlist'
+			* treat1: the first binary treatment we are interest in  --> One can acces this local by `treat1'
+			* treat2: the second binary treatment we are interest in --> One can acces this local by `treat2'
+			* covariates: local of control variables  --> One can acces this local by `covariates'
 			* gen: the name of the new matrix to be returned, stored in r(name)
 		*/	
 	
 		local dep_vars 	`varlist' // define local of dependent variables
-	
-		loc regressors `treat1' `treat2'   `covariates' // define local of regressors
+		* The local of dep_vars takes into account all variable outcomes defined in the rows section
+		
+		loc regressors `treat1' `treat2' `covariates' // define local of regressors
+		* The local of regressor takes into account all rigth term of equation one.
 		
 		local dec `decimals'
 	
 
 		* Initialize matrices **************************************************
-		mat control_mean	= J(`:word count `dep_vars'',2,.) // generate matrix
-		mat reg_count 		= J(`:word count `dep_vars'',2,.)
 
-		mat reg1 			= J(`:word count `dep_vars'',2,.)
- 		mat reg2 			= J(`:word count `dep_vars'',2,.)
+		mat control_mean	= J(`:word count `dep_vars'',2,.) // Matrix for column 1: Control mean
+		mat reg_count 		= J(`:word count `dep_vars'',2,.) // Matrix for column 2: Number of observations in regressions
+
+		mat reg1 			= J(`:word count `dep_vars'',2,.) // Matrix for column 3: Estimates of transport intervention
+ 		mat reg2 			= J(`:word count `dep_vars'',2,.) // Matrix for column 4: Estimates of workshop intervention
 
 		mat stars1 			= J(`:word count `dep_vars'',2,.)
  		mat stars2 			= J(`:word count `dep_vars'',2,.)
 
-		mat cpval 			= J(`:word count `dep_vars'',2,.)
+		mat cpval 			= J(`:word count `dep_vars'',2,.) // Matrix for column 5: P value of ttest
  
 		* Initializing row names. **********************************************
-		 mat rownames control_mean = `dep_vars'
+		
+		mat rownames control_mean = `dep_vars'
 		mat colnames control_mean = "Control mean"
 	
 		*mat rownames reg_count = `dep_vars'
@@ -85,19 +97,60 @@ cap program drop itt_maker_jobs
 		/* Defining the row names and the column names of the matrix */
 
 		loc i = 1
+		
+		/*
+		
+		The below loop will go trough every row of the established matrices (or simply the dependent variables).
+		Every step of the loop fills in the respective value in each of the matrices
+		
+		*/
 		foreach y in `dep_vars'{ 
 	 
-		cap sum bs_`y',d 
-		capture confirm variable bs_`y'
-		
-		if !_rc {
-               	reg `y' bs_`y' `regressors'   [pw=ed_weight],   cluster(cluster_id) 
-
-               }
-               else {
-			   			reg `y' `regressors' [pw=ed_weight],   cluster(cluster_id) 
-
-                }
+			cap sum bs_`y',d 
+			capture confirm variable bs_`y'
+			
+			/*
+			The previuos line of code is an excellent way of telling stata to do two different things if the condition is
+			met. Thus, if the variable is the baseline outcome variable is in the data set, then run the regression model
+			taking the baseline outcome variable as a covariates. Conversly, if the condition is not met (e.g. the baseline
+			variable is not in the data set), then run the regression model without the baseline variable as covariate.
+			
+			IT REALLY IS A COOL WAY TO HANDLE THIS PROBLEM
+			*/
+			
+			if !_rc {
+				reg `y' bs_`y' `regressors' [pw=ed_weight], cluster(cluster_id) 
+			}
+			else {
+				reg `y' `regressors' [pw=ed_weight], cluster(cluster_id) 
+			}
+			
+			
+			/*
+			
+			Regression structure:
+			
+			The estimation to estimate is the following:
+			
+			Y_ic = β_0 + β_1 x treat\_transport_{fic} + + β_2 x treat\_workshop_{fic}  + γ x spillover_{fic}] + α x y_{ic,pre} + δ x X_{ic0} + μ_{ic}
+			
+			
+			The elements of the regression are:
+				1. Dependent variable: Changes with every step of the loop. It is represented by the local `y'
+				2. Pre treatment outcome variable: As explained above, capture confirm variable bs_`y' help to
+				determine if the baseline outcome variable should be included in the model.
+				3. Regressors: Defined as the covariates input in the program plus the two branches of treatment;
+				1) transport subsidy or 2) workshop intervention.
+				4. Regression weights: Given the sampling frequency of differente groups of the population
+				to be represented in the study sample, inverse weights help to estimate the ITT according to
+				the proportion of this subgroups in the sample. This is done by the option in brackets pw
+				5. Standar cluster errors: As the randomization of the sample and treatments was done in two steps.
+				Firstly geographical zones and secondly within zones teatment randomization, the standar errors should
+				be cluster to allow correlation within geographical zones of individuals. This is done by the option
+				cluster(cluser_var)
+			
+			*/
+			
 			local p1 = (2 * ttail(e(df_r), abs(_b[`treat1']/_se[`treat1']))) 	// calculate p value for treatment 1
 			local p2 = (2 * ttail(e(df_r), abs(_b[`treat2']/_se[`treat2'])))	// calculate p value for treatment 2
 
@@ -143,7 +196,7 @@ cap program drop itt_maker_jobs
 				*mat reg2[`i',2] = _se[`treat2']
  
 	
-			local i = `i' + 1 
+			local i = `i' + 1   // increasing the local `i' value for the next row in all matrices
 		}
 	
 	
