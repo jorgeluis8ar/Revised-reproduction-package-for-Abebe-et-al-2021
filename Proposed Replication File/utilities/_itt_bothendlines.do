@@ -1,24 +1,29 @@
 
-	********************************************************************************
+* Commented by: Jorge Luis Ochoa Rincón
+
+********************************************************************************
 * Define a program to make tables ******************************************
 ********************************************************************************
 
-	cap program drop itt_maker_jobstime
-	program define itt_maker_jobstime, rclass
+cap program drop itt_maker_jobstime
+program define itt_maker_jobstime, rclass
 		syntax varlist, TREAT1(varlist) TREAT2(varlist) COVARIATES(varlist) FILENAME(name) DECIMALS(integer)  [NON] [CP]
 		/* 
-			* varlist: local of dependent variables 
-			* treat1: the first binary treatment we are interest in
-			* treat2: the second binary treatment we are interest in
-			* covariates: local of control variables 
+			* varlist: local of dependent variables  --> One can acces this local by `varlist'
+			* treat1: the first binary treatment we are interest in --> One can acces this local by `treat1'
+			* treat2: the second binary treatment we are interest in --> One can acces this local by `treat2'
+			* covariates: local of control variables  --> One can acces this local by `covariates'
 		*/	
-	foreach t in 2 6{
+foreach t in 2 6{
 	
 		local dep_vars 	`varlist' // define local of dependent variables
-	
-		loc regressors `treat1' `treat2'   `covariates' // define local of regressors
+		* The local of dep_vars takes into account all variable outcomes defined in the rows section
+		
+		local regressors `treat1' `treat2'   `covariates' // define local of regressors
+		* The local of regressors takes into account all variables in the rigth hand side of equation 1
 		
 		local dec `decimals'
+		
 		cap drop  pval1
 		cap gen pval1 =.
 
@@ -26,20 +31,21 @@
 		cap gen pval2 =.
 		
 		* Initialize matrices **************************************************
-		mat control_mean	= J(`:word count `dep_vars'',3,.) // generate matrix
-		mat reg_count 		= J(`:word count `dep_vars'',3,.)
+		
+		mat control_mean	= J(`:word count `dep_vars'',3,.) // Matrix for columns 1 and 5: Control mean
+		mat reg_count 		= J(`:word count `dep_vars'',3,.) // Matrix for the number of observations in each regression
 
-		mat reg1 			= J(`:word count `dep_vars'',3,.)
- 		mat reg2 			= J(`:word count `dep_vars'',3,.)
+		mat reg1 			= J(`:word count `dep_vars'',3,.) // Matrix for columns 2 and 6:Estimates of transport subsidy
+ 		mat reg2 			= J(`:word count `dep_vars'',3,.) // Matrix for columns 3 and 7:Estimates of workshop intervention
 
-		mat stars1 			= J(`:word count `dep_vars'',3,.)
- 		mat stars2 			= J(`:word count `dep_vars'',3,.)
+		mat stars1 			= J(`:word count `dep_vars'',3,.) // Matrix for the legend of statistical significance reg1
+ 		mat stars2 			= J(`:word count `dep_vars'',3,.) // Matrix for the legend of statistical significance reg2
 
 		*mat pval 			= J(`:word count `dep_vars'',3,.)
 
-		mat cpval 			= J(`:word count `dep_vars'',3,.)
+		mat cpval 			= J(`:word count `dep_vars'',3,.) // Matrix for column 5: P value of linear hypotheses
  
-		* Initializing row names. **********************************************
+		* Initializing row names ***********************************************
 		
 		mat rownames control_mean = `dep_vars'
 		mat colnames control_mean = "Control mean"
@@ -57,28 +63,66 @@
 		foreach y in `dep_vars'{ 
 	
 			* inputting values into the matrix piece by piece ******************
-			qui sum `y' if (treat_groupind == 5  )& time==`t'  [aw=ed_weight]  // define the control group
-			* control mean
-			mat control_mean[`i', 1] 	= r(mean)
-		display "`y'"
-
-		cap sum bs_`y',d 
-		capture confirm variable bs_`y'
-		
-		if !_rc {
-               	reg `y' bs_`y' `regressors'   [pw=ed_weight] if time==`t',   cluster(cluster_id) 
-
-               }
-               else {
-			   			reg `y' `regressors' [pw=ed_weight] if time==`t',   cluster(cluster_id) 
-
-                }
-
-			local p1 = (2 * ttail(e(df_r), abs(_b[`treat1']/_se[`treat1']))) 	// calculate p value for treatment 1
-			local p2 = (2 * ttail(e(df_r), abs(_b[`treat2']/_se[`treat2'])))	// calculate p value for treatment 2
 			
+			quietly sum `y' if (treat_groupind == 5  ) & (time==`t')  [aw=ed_weight]
+			/*
+			Defining the control mean for each variable using inverse frequency weights in the sample
+			*/
+		
+			* control mean -----------------------------------------------------
+			
+			mat control_mean[`i', 1] 	= r(mean)
 
-			* count of regression
+
+			cap sum bs_`y',d 
+			capture confirm variable bs_`y'
+			
+			/*
+			The previuos line of code is an excellent way of telling stata to do two different things if the condition is
+			met. Thus, if the variable is the baseline outcome variable is in the data set, then run the regression model
+			taking the baseline outcome variable as a covariates. Conversly, if the condition is not met (e.g. the baseline
+			variable is not in the data set), then run the regression model without the baseline variable as covariate.
+			
+			IT REALLY IS A COOL WAY TO HANDLE THIS PROBLEM
+			*/
+			
+			if !_rc {
+				reg `y' bs_`y' `regressors' [pw=ed_weight] if time==`t', cluster(cluster_id) 
+			}
+			else {
+				reg `y' `regressors' [pw=ed_weight] if time==`t', cluster(cluster_id) 
+			}
+			/*
+			
+			Regression structure:
+			
+			The estimation to estimate is the following:
+			
+			Y_ic = β_0 + β_1 x treat\_transport_{fic} + + β_2 x treat\_workshop_{fic} + α x y_{ic,pre} + δ x X_{ic0} + μ_{ic}
+			
+			
+			The elements of the regression are:
+				1. Dependent variable: Changes with every step of the loop. It is represented by the local `y'
+				2. Pre-treatment outcome variable: As explained above, capture confirm variable bs_`y' help to
+				   determine if the baseline outcome variable should be included in the model.
+				3. Regressors: Defined as the covariates input in the program plus the two branches of treatment;
+				   1) transport subsidy or 2) workshop intervention.
+				4. Regression weights: Given the sampling frequency of differente groups of the population
+				   to be represented in the study sample, inverse weights help to estimate the ITT according to
+				   the proportion of this subgroups in the sample. This is done by the option in brackets pw
+				5. Standar cluster errors: As the randomization of the sample and treatments was done in two steps.
+				   Firstly geographical zones and secondly within zones teatment randomization, the standar errors should 
+				   be cluster to allow correlation within geographical zones of individuals. This is done by the option
+				   cluster(cluser_var)
+				6. Subsample: The regressions are measuring impacts of both interventions in different periods of time. 
+				   For the first endline (2 years after the intervention) and the second endline (6 years after the intervention).
+				   This is done by using the local `t' and subsampling the data with the conditional if.
+			
+			I eliminated two lines that were repeated below
+			*/
+				
+			* count of regression ----------------------------------------------
+			
 			mat reg_count[`i', 1] 		= e(N)
 			* P values and stars 
 				local p1 = (2 * ttail(e(df_r), abs(_b[`treat1']/_se[`treat1'])))

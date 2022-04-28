@@ -1,7 +1,10 @@
 # Revised-reproduction-package-for-Abebe-et-al-2021
 
-
 This Repository holds a reproduction package for Abebe et al (2021) - Anonymity or Distance? Job Search and  Market Exclusion in a Growing African City
+
+## Abstract
+
+> We show that helping young job seekers signal their skills to employers generates large and persistent improvements in their labour market outcomes. We do this by comparing an intervention that improves the ability to signal skills (the “job application workshop”) to a transport subsidy treatment designed to reduce the cost of job search. In the short run, both interventions have large positive effects on the probability of finding a formal job. The workshop also increases the probability of having a stable job with an open-ended contract. Four years later, the workshop significantly increases earnings, job satisfaction, and employment duration, but the effects of the transport subsidy have dissipated. Gains are concentrated on individuals who generally have worse labour market outcomes. Overall, our findings highlight that young people possess valuable skills that are unobservable to employers. Making these skills observable generates earnings gains that are far greater than the cost of the intervention.
 
 ---
 ## Repository Organization
@@ -28,12 +31,16 @@ he task here is to improve documentation by adding comments to the code. You are
 #### Solution
 For this third deliverable I will be editing or commenting the existing code. To access the commit click on the comit's name. All commits are summarized in the following lists:
 
-* **\_itt_oneendline.do**: This Do file creates the program that produces Table 3 of the paper. The proposed changes or comments to the files are the following:
+* **[main_end_line_results.do](https://github.com/jorgeluis8ar/Revised-reproduction-package-for-Abebe-et-al-2021/blob/main/Proposed%20Replication%20File/do/main_endline_results.do)**: This Do File calls programs from the [Utilities](https://github.com/jorgeluis8ar/Revised-reproduction-package-for-Abebe-et-al-2021/tree/main/Proposed%20Replication%20File/utilities) folder to make figures and tables using the end line results. This is the main script.
+
+    + **[Changed lines od code for loops to create tables 5 and 6 and ossome organization](https://github.com/jorgeluis8ar/Revised-reproduction-package-for-Abebe-et-al-2021/commit/d5c11dcb7b29ba319e42c9d09c46756ca05923f4)** (tag: d5c11dc): This commit gives better organization to the Do File and creates a loop to create Tables 5 and 6. This tables were scattered over the Do File.
+
+* **[\_itt_oneendline.do](https://github.com/jorgeluis8ar/Revised-reproduction-package-for-Abebe-et-al-2021/blob/main/Proposed%20Replication%20File/utilities/_itt_oneendline.do)**: This Do file creates the program that produces Table 3 of the paper. The proposed changes or comments to the files are the following:
     + **[Cool programming trick and Table 3 regression description](https://github.com/jorgeluis8ar/Revised-reproduction-package-for-Abebe-et-al-2021/commit/ce7b2d1546f0be8c1006b62b1fcb8fa08944bc8f)**  (tag: ce7b2d1) : This commit comments on a cool trick in stata in order to account for different cases extending from a command. Example: types of variables. Whether a variable is string or numeric, the program does two different things. In the code the authors use to run regressions whether the variables exists or not.
 
     + **[Final description of the Do File and scratching off unsed lines](https://github.com/jorgeluis8ar/Revised-reproduction-package-for-Abebe-et-al-2021/commit/deddd0e0e7c3b0dc6bd1a2ce24abf29283bc6d8e)** (tag: deddd0e): This commit comprises the final complete dscription of the function, scratching off unused lines in the code and changes in the Do File. 
     
-* **\_itt_het.do**: This Di file creates the program that produces Tables 4,5,6 and A.26 of the paper and online annex. The proposed changes or comments to the files are the following:
+* **[\_itt_het.do](https://github.com/jorgeluis8ar/Revised-reproduction-package-for-Abebe-et-al-2021/blob/main/Proposed%20Replication%20File/utilities/_itt_het.do)**: This Di file creates the program that produces Tables 4,5,6 and A.26 of the paper and online annex. The proposed changes or comments to the files are the following:
     + **[Cool Stata programing trick, regression description and modifying the output of the program](https://github.com/jorgeluis8ar/Revised-reproduction-package-for-Abebe-et-al-2021/commit/d6b2a2e8158fab04975ec35186ddacc6c33c7357)** (tag: d6b2a2e):  This commit comments on a coll trick used in Stata. In detail, the authors use it to account for the non existence of a baseline variable. If it does exists, the program runs a diferent specification that if it does no exist. I also describe the regression specification and explain what is been used in each option. Finally I propose a small change of the program so it does not print every single step of the loop.
     + **[Final comments on the matrices filling, modifying the program ooutput](https://github.com/jorgeluis8ar/Revised-reproduction-package-for-Abebe-et-al-2021/commit/022d67398d62c3d46974c861532ff0fa189ca29a)** (tag: 022d673): This commit gives the finals comments on the matrices filing and modifies the program so not every step of the loops gets printed.
     + **[Q-values and finals commets in all the program](https://github.com/jorgeluis8ar/Revised-reproduction-package-for-Abebe-et-al-2021/commit/39a899a7236ea5c4388241921f426cc96647fd73)** (tag: 39a899a): This commit gives comments on what going on in the definition of the Q-values in a two step methodology. Finally, all the process of the program is outlined for further reproduction.
