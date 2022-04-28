@@ -318,34 +318,37 @@ restore
  
 ***************************************************************************************************
  
-****************************************** FIGURES 3 AND A.3   ************************************
+****************************************** FIGURES 1 AND A.3   ************************************
 preserve
-keep if time==6
 
-su monthly_wage, d
+keep if time==6
+quietly sum monthly_wage, d
 drop if monthly_wage >= `r(p99)'
-ge cumul_earn =.
+
+gen cumul_earn =.
 foreach v in 1 2 5 {
- cumul monthly_wage if treat_groupind ==`v' [aw=ed_weight] , gen(cumul_earn`v') eq
-replace cumul_earn = cumul_earn`v' if treat_groupind ==`v'
+	cumul monthly_wage if treat_groupind ==`v' [aw=ed_weight] , gen(cumul_earn`v') eq
+	replace cumul_earn = cumul_earn`v' if treat_groupind ==`v'
 }
 
-*cumulative earnings plots (copied from Stefano)
-twoway (line cumul_earn5 monthly_wage if treat_groupind ==5, sort) (line cumul_earn2 monthly_wage if treat_groupind ==2, sort) , ///
-legend (label(1 "Control") label(2 "Workshop")) ///
- ytitle("Cumulative percent")  ///
-       graphr(fc(white) lc(white)) graphregion(margin(l+5 r+5)) ///
-        xtitle("Earnings", margin(medium)) 
-	*graph save  "01 Paper/Figures/Second_endline/Dominance.gph" , replace
-	graph export "figures/figure3.png", replace width(1600) height(1200)
+** Figure 1: The distribution of endline 2 earnings in the workshop and control group
+twoway (line cumul_earn5 monthly_wage if treat_groupind ==5, sort) ///
+       (line cumul_earn2 monthly_wage if treat_groupind ==2, sort) , ///
+		legend (label(1 "Control") label(2 "Workshop")) ///
+		ytitle("Cumulative percent")  ///
+		graphr(fc(white) lc(white)) graphregion(margin(l+5 r+5)) ///
+		xtitle("Earnings", margin(medium)) 
+*graph save  "01 Paper/Figures/Second_endline/Dominance.gph" , replace
 
-	
-	
-twoway (line cumul_earn5 monthly_wage if treat_groupind ==5, sort) (line cumul_earn1 monthly_wage if treat_groupind ==1, sort) , ///
-legend (label(1 "Control") label(2 "Transport")) ///
- ytitle("Cumulative percent")  ///
+graph export "figures/figure1.png", replace width(1600) height(1200)
+
+** Figure a3 The distribution of endline 2 earnings in the transport and control group	
+twoway (line cumul_earn5 monthly_wage if treat_groupind ==5, sort) ///
+       (line cumul_earn1 monthly_wage if treat_groupind ==1, sort) , ///
+       legend (label(1 "Control") label(2 "Transport")) ///
+       ytitle("Cumulative percent")  ///
        graphr(fc(white) lc(white)) graphregion(margin(l+5 r+5)) ///
-        xtitle("Earnings", margin(medium)) 
+       xtitle("Earnings", margin(medium)) 
  *  graph save  "figures/Figures/Second_endline/Dominance_transport.gph" , replace
 	graph export "figures/figure_a3.png", replace width(1600) height(1200)
 	
