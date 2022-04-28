@@ -25,6 +25,42 @@ The idea of the table is to present how estimates change by thre presence of bas
 the individuals. In detail, the table compares individuals who are male to those who are not. The table
 compares individuals who are active job searchers to those who are not.
 
+
+Rows:
+
+1. Baseline characteristic of whether the person studied at the tertiary level
+2. Baseline characteristic of whether the person is female of male
+3. Baseline characteristic of whether the person is an active job searcher
+4. Baseline characteristic of whether the person has ever had a permanent job
+5. Baseline characteristic of whether the person lives close to the CDB
+
+Columns:
+
+1. Control mean of each of the independent variables in local `varlist' for the subsample of baseline covarite =0.
+2. Coefficient of the transport intervention for the subsample of baseline covarite =0
+3. Coefficient of the workshop intervention for the subsample of baseline covarite =0
+4. Control mean of each of the independent variables in local `varlist' for the subsample of baseline covarite =1.
+5. Coefficient of the transport intervention for the subsample of baseline covarite =1
+6. Coefficient of the workshop intervention for the subsample of baseline covarite =1
+7. P value of a linear hypotheses for equal estimates (are effects from the transport
+   subsides in the sample of baseline covariate =0 equal to the effects from the transport
+   subsides in the sample of baseline covariate =1?) .
+8. P value of a linear hypotheses for equal estimates (are effects from the workshop
+   intervention in the sample of baseline covariate =0 equal to the effects from the workshop
+   intervention in the sample of baseline covariate =1?) .
+   
+The program runs all the following steps:
+
+1. Definition of locals.
+2. Definition of matrices. This matrices will be used to create a unique matrix with all results
+3. Matrices rownames and colnames are assigned.
+4. In order to fill in the matrices, a loop goes through baseline covariates equal to 1 or 0
+   and fills in the corresponding value in each of the seven matrices. Matrices stars are
+   used to give the legend of statistical significance in the document.
+5. Q values are created in a two stage methodology
+6. Lastly, all the matrices are merged and the finall matrix is given the right format.
+
+
 */
 
 cap program drop itt_maker_het
@@ -43,7 +79,7 @@ program define itt_maker_het, rclass
 	The two groups are defined in the following local `h', where regression take subsamples if covariates
 	take the value of 1 or 0.
 	*/
-	foreach h in 0 1{
+foreach h in 0 1{
 
 		* Defining the locals **************************************************
 		
@@ -249,108 +285,134 @@ program define itt_maker_het, rclass
 		}
 	 
 		
-	*** creat q-values 	
+	* Create q-values **********************************************************
+	
 	foreach p in 1 2{
-	preserve 
-	keep pval`p'  `het_vars'  `regressors'   
- 	
-	keep if pval`p'!=.
-  
-	
-	quietly sum pval`p'
-	local totalpvals = r(N)
+		preserve 
+		
+		quietly keep pval`p'  `het_vars'  `regressors'   // Filtering the data set
+		quietly keep if pval`p'!=.                       // Keep those observation that have values of pval1 or pval2 different to missing
+	  		
+		quietly sum pval`p'
+		
+		local totalpvals = r(N)   // Total number of nonmissing observations with pvalue
 
-	quietly gen int original_sorting_order = _n
-	quietly sort pval`p'
-	quietly gen int rank = _n if pval`p'~=.
-	
-	gen bky06_qval = 1 if pval`p'~=.
+		quietly gen int original_sorting_order = _n
+		quietly sort pval`p'
+		quietly gen int rank = _n if pval`p'~=.
+		
+		gen bky06_qval = 1 if pval`p'~=.
 
-	local qval = 1
+		local qval = 1
+		while `qval' > 0 {
+		
+			* First Stage ----------------------------------------------------------
+			
+			* Generate the adjusted first stage q level we are testing: q' = q/1+q
+			local qval_adj = `qval'/(1+`qval')
+			
+			* Generate value q'*r/M
+			quietly gen fdr_temp1 = `qval_adj'*rank/`totalpvals'
+			
+			* Generate binary variable checking condition p(r) <= q'*r/M
+			quietly gen reject_temp1 = (fdr_temp1>=pval`p') if pval`p'~=.
+			
+			* Generate variable containing p-value ranks for all p-values that meet above condition
+			quietly gen reject_rank1 = reject_temp1*rank
+			
+			* Record the rank of the largest p-value that meets above condition
+			quietly egen total_rejected1 = max(reject_rank1)
 
-	
-	while `qval' > 0 {
-	* First Stage
-	* Generate the adjusted first stage q level we are testing: q' = q/1+q
-	local qval_adj = `qval'/(1+`qval')
-	* Generate value q'*r/M
-	gen fdr_temp1 = `qval_adj'*rank/`totalpvals'
-	* Generate binary variable checking condition p(r) <= q'*r/M
-	gen reject_temp1 = (fdr_temp1>=pval`p') if pval`p'~=.
-	* Generate variable containing p-value ranks for all p-values that meet above condition
-	gen reject_rank1 = reject_temp1*rank
-	* Record the rank of the largest p-value that meets above condition
-	egen total_rejected1 = max(reject_rank1)
+			* Second Stage ---------------------------------------------------------
+			
+			* Generate the second stage q level that accounts for hypotheses rejected in first stage: q_2st = q'*(M/m0)
+			local qval_2st = `qval_adj'*(`totalpvals'/(`totalpvals'-total_rejected1[1]))
+			
+			* Generate value q_2st*r/M
+			quietly gen fdr_temp2 = `qval_2st'*rank/`totalpvals'
+			
+			* Generate binary variable checking condition p(r) <= q_2st*r/M
+			quietly gen reject_temp2 = (fdr_temp2>=pval`p') if pval`p'~=.
+			
+			* Generate variable containing p-value ranks for all p-values that meet above condition
+			quietly gen reject_rank2 = reject_temp2*rank
+			
+			* Record the rank of the largest p-value that meets above condition
+			quietly egen total_rejected2 = max(reject_rank2)
+			
 
-	* Second Stage
-	* Generate the second stage q level that accounts for hypotheses rejected in first stage: q_2st = q'*(M/m0)
-	local qval_2st = `qval_adj'*(`totalpvals'/(`totalpvals'-total_rejected1[1]))
-	* Generate value q_2st*r/M
-	gen fdr_temp2 = `qval_2st'*rank/`totalpvals'
-	* Generate binary variable checking condition p(r) <= q_2st*r/M
-	gen reject_temp2 = (fdr_temp2>=pval`p') if pval`p'~=.
-	* Generate variable containing p-value ranks for all p-values that meet above condition
-	gen reject_rank2 = reject_temp2*rank
-	* Record the rank of the largest p-value that meets above condition
-	egen total_rejected2 = max(reject_rank2)
-
-	* A p-value has been rejected at level q if its rank is less than or equal to the rank of the max p-value that meets the above condition
-	replace bky06_qval = `qval' if rank <= total_rejected2 & rank~=.
-	* Reduce q by 0.001 and repeat loop
-	drop fdr_temp* reject_temp* reject_rank* total_rejected*
-	local qval = `qval' - .001
-	}
+			* A p-value has been rejected at level q if its rank is less than or equal to the rank of the max p-value that meets the above condition
+			quietly replace bky06_qval = `qval' if rank <= total_rejected2 & rank~=.
+			
+			* Reduce q by 0.001 and repeat loop
+			quietly drop fdr_temp* reject_temp* reject_rank* total_rejected*
+			
+			local qval = `qval' - .001
+		}
 	
 		local qval = 1
-	gen bh95_qval = 1 if pval~=.
+		quietly gen bh95_qval = 1 if pval~=.
 
-	while `qval' > 0 {
-	* Generate value qr/M
-	quietly gen fdr_temp = `qval'*rank/`totalpvals'
-	* Generate binary variable checking condition p(r) <= qr/M
-	quietly gen reject_temp = (fdr_temp>=pval) if fdr_temp~=.
-	* Generate variable containing p-value ranks for all p-values that meet above condition
-	quietly gen reject_rank = reject_temp*rank
-	* Record the rank of the largest p-value that meets above condition
-	quietly egen total_rejected = max(reject_rank)
-	* A p-value has been rejected at level q if its rank is less than or equal to the rank of the max p-value that meets the above condition
-	replace bh95_qval = `qval' if rank <= total_rejected & rank~=.
-	* Reduce q by 0.001 and repeat loop
-	quietly drop fdr_temp reject_temp reject_rank total_rejected
-	local qval = `qval' - .001
-}
-
-
-	quietly sort original_sorting_order
-	
-	local m = 1
-	display "`totalpvals'"
-	while `m' <= `totalpvals'{
-	local pos = `m'  
-	mat reg`p'[`pos',3] = bky06_qval[`m']
-*	mat qvals[`pos',1] = bh95_qval[`m']
-
-	local m = `m'+1 
-	}
-	 
-	restore
-	}
-
- 		* Merge matrices together to form larger matrix
-		frmttable, statmat(control_mean)  sdec( `dec' , `dec', `dec'  ) varlabels substat(2) `merge'
-		if "`non'"!="non"{
-		frmttable, statmat(reg_count) sdec(0) varlabels substat(2)  merge 
+		while `qval' > 0 {
+			
+			* Generate value qr/M
+			quietly gen fdr_temp = `qval'*rank/`totalpvals'
+			
+			* Generate binary variable checking condition p(r) <= qr/M
+			quietly gen reject_temp = (fdr_temp>=pval) if fdr_temp~=.
+			
+			* Generate variable containing p-value ranks for all p-values that meet above condition
+			quietly gen reject_rank = reject_temp*rank
+			
+			* Record the rank of the largest p-value that meets above condition
+			quietly egen total_rejected = max(reject_rank)
+			
+			* A p-value has been rejected at level q if its rank is less than or equal to the rank of the max p-value that meets the above condition
+			quietly replace bh95_qval = `qval' if rank <= total_rejected & rank~=.
+			
+			* Reduce q by 0.001 and repeat loop
+			quietly drop fdr_temp reject_temp reject_rank total_rejected
+			
+			local qval = `qval' - .001
 		}
+
+
+		quietly sort original_sorting_order
+		
+		local m = 1
+		
+		display "`totalpvals'"
+		
+		while `m' <= `totalpvals'{
+			local pos = `m'  
+			
+			mat reg`p'[`pos',3] = bky06_qval[`m']
+		*	mat qvals[`pos',1] = bh95_qval[`m']
+
+			local m = `m'+1 
+		}
+	 
+		restore
+	}
+
+	* Merge matrices together to form larger matrix ****************************
+	
+	frmttable, statmat(control_mean)  sdec( `dec' , `dec', `dec'  ) varlabels substat(2) `merge'
+	
+	if "`non'"!="non"{
+		frmttable, statmat(reg_count) sdec(0) varlabels substat(2)  merge 
+	}
 		frmttable, statmat(reg1) sdec(`dec'\   `dec' \  3) annotate(stars1) asymbol(*,**,***) varlabels merge substat(2)
 		frmttable, statmat(reg2)  sdec(`dec'\   `dec' \  3) annotate(stars2) asymbol(*,**,***) varlabels merge substat(2)
 		
 		local merge merge
-}
-		if "`cp'"=="cp"{
-		 frmttable, statmat(cpval)   varlabels merge substat(2)
-		}
-		
-		if "`non'"!="non"{
+	}
+	
+	if "`cp'"=="cp"{
+		frmttable, statmat(cpval)   varlabels merge substat(2)
+	}
+	
+	if "`non'"!="non"{
 		frmttable using "tables/`filename'", 	///
 		tex ///
 		fragment ///
@@ -362,37 +424,37 @@ program define itt_maker_het, rclass
 		"Baseline covariate", "mean", "N", "", "","mean", "N", \ ///
 		"", "(1)", "(2)", "(3)", "(4)", "(5)", "(6)", "(7)", "(8)") ///
 		multicol(1,2,4;1,6,4) 
-		}
-		else{
+	}
+	else{
+	
 		if "`cp'"!="cp"{
-		frmttable using "tables/`filename'", 	///
-		tex ///
-		fragment ///
-		varlabels ///
-		nocenter ///
-		replace ///
-		ctitle("", "Covariate = 0", "", "",  "Covariate = 1", "", "", ""\ ///
-		"\cmidrule(lr){2-4}\cmidrule(lr){5-7}", "Control", "{Transport}", "{Workshop}", "Control",  "{Transport}", "{Workshop}"\ ///
-		"Baseline covariate", "mean", "", "", "mean" \ ///
-		"", "(1)", "(2)", "(3)", "(4)", "(5)", "(6)") ///
-		multicol(1,2,3;1,5,3) 
+			frmttable using "tables/`filename'", 	///
+			tex ///
+			fragment ///
+			varlabels ///
+			nocenter ///
+			replace ///
+			ctitle("", "Covariate = 0", "", "",  "Covariate = 1", "", "", ""\ ///
+			"\cmidrule(lr){2-4}\cmidrule(lr){5-7}", "Control", "{Transport}", "{Workshop}", "Control",  "{Transport}", "{Workshop}"\ ///
+			"Baseline covariate", "mean", "", "", "mean" \ ///
+			"", "(1)", "(2)", "(3)", "(4)", "(5)", "(6)") ///
+			multicol(1,2,3;1,5,3) 
 		}
 		else{
-		*append one more row
- 		frmttable using "tables/`filename'", 	///
-		tex ///
-		fragment ///
-		varlabels ///
-		nocenter ///
-		replace ///
-		ctitle("", "Covariate = 0", "","" ,  "Covariate = 1", "",  "","Transport" , "Workshop"\ ///
-		"\cmidrule(lr){2-4}\cmidrule(lr){5-7}\cmidrule(lr){8-9}", "Control", "{Transport}", "{Workshop}", , "Control",  "{Transport}", "{Workshop}" ,"{Equality}","{Equality}"\ ///
-		"Baseline covariate", "mean", "", "",   "mean", "", "", "(pval)", "(pval)" \ ///
-		"", "(1)", "(2)", "(3)", "(4)", "(5)", "(6)", "(7)", "(8)") ///
-		multicol(1,2,3;1,5,3) 
-		
+			*append one more row
+			frmttable using "tables/`filename'", 	///
+			tex ///
+			fragment ///
+			varlabels ///
+			nocenter ///
+			replace ///
+			ctitle("", "Covariate = 0", "","" ,  "Covariate = 1", "",  "","Transport" , "Workshop"\ ///
+			"\cmidrule(lr){2-4}\cmidrule(lr){5-7}\cmidrule(lr){8-9}", "Control", "{Transport}", "{Workshop}", , "Control",  "{Transport}", "{Workshop}" ,"{Equality}","{Equality}"\ ///
+			"Baseline covariate", "mean", "", "",   "mean", "", "", "(pval)", "(pval)" \ ///
+			"", "(1)", "(2)", "(3)", "(4)", "(5)", "(6)", "(7)", "(8)") ///
+			multicol(1,2,3;1,5,3)
 		}
-		}
+}
 		
 		display "end"
 		
