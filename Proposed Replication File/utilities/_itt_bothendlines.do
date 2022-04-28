@@ -40,6 +40,7 @@
 		mat cpval 			= J(`:word count `dep_vars'',3,.)
  
 		* Initializing row names. **********************************************
+		
 		mat rownames control_mean = `dep_vars'
 		mat colnames control_mean = "Control mean"
 	

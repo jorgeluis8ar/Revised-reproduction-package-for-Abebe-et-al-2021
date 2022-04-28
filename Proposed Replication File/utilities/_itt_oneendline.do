@@ -76,8 +76,8 @@ program define itt_maker_jobs, rclass
 		mat reg1 			= J(`:word count `dep_vars'',2,.) // Matrix for column 3: Estimates of transport intervention
  		mat reg2 			= J(`:word count `dep_vars'',2,.) // Matrix for column 4: Estimates of workshop intervention
 
-		mat stars1 			= J(`:word count `dep_vars'',2,.)
- 		mat stars2 			= J(`:word count `dep_vars'',2,.)
+		mat stars1 			= J(`:word count `dep_vars'',2,.) // Matrix for the legend of statistical significance reg1
+ 		mat stars2 			= J(`:word count `dep_vars'',2,.) // Matrix for the legend of statistical significance reg2
 
 		mat cpval 			= J(`:word count `dep_vars'',2,.) // Matrix for column 5: P value of ttest
  

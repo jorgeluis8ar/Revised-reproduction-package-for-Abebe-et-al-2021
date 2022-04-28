@@ -58,10 +58,11 @@ covariates($balance) decimals(3) filename(table3)
   *** NOTE: The final rows for Tables 4, 5, and 6 are generated separately in the file "endogenous_stratification.do"
  ****************************************** TABLE 4 ****************************************** 
 preserve
-keep if time ==6																						***** 	TO DO: WE HAVE TO APPEND THE FINAL ROW MANUALLY
+keep if time ==6																						
+***** 	TO DO: WE HAVE TO APPEND THE FINAL ROW MANUALLY
 itt_maker_het tertiary_ed  male bs_high_intense bs_experience_perm close_centre, outcome(monthly_wage) treat1(tg_1) treat2(tg_2) ///
 covariates($balance) decimals(1) filename(table4) non  cp
- restore
+restore
   *********************************************************************************************
 
 
