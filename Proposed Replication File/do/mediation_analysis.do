@@ -83,6 +83,24 @@ matrix all = [_b[workshop], _b[workshop] + $ci*_se[workshop], _b[workshop] - $ci
 global b0 = _b[workshop]
 
 
+/*
+The following ckunk of code provide results necesary to produce figure 4.
+
+What the code does is resume as follows>
+
+1. In previous exercises or in table a.24 we generated marginal effects of some covariates on the 2018 wage earnings.
+   This estimates were stored in a matrix called all.
+2. The following exercise is to predict the monthly wage for those individual in the treatment group as if they had been
+   assigned to the control group. This is done by estimating a regression and then replacinng the treatment status to
+   control (replace treatment = 0). Then we can predict what they 2018 wage earning would have been. The measure is not 
+   exact, but still is a good measure of a counterfactual.
+3. Then, this predicted wage earning is regressed by the same specification were the matrix all was created.
+4. Then, the authors proceed to calculate a linear combination of the estimates to calculate the marginal effect 
+   of the job application workshop in wage earnings. See figure 4 of the paper.
+5. All regressions use the Frisch-Waugh-Lovell (FWL) theorem to partial out covariates.
+
+*/
+dis "${rN}"
 forvalues s = 1(1)$rN {
 
 	preserve
@@ -102,7 +120,7 @@ forvalues s = 1(1)$rN {
 	replace transport = transport_t
 	replace workshop = workshop_t
 
-	ivreg2 monthly_wage2res    transport workshop bs_monthly_wage $balance  [pw=ed_weight]  , partial($balance ) cluster(cluster_id)
+	ivreg2 monthly_wage2res transport workshop bs_monthly_wage $balance  [pw=ed_weight]  , partial($balance ) cluster(cluster_id)
 	matrix temp = [_b[workshop], _b[workshop] + $ci*_se[workshop], _b[workshop] - $ci*_se[workshop]]
 	matrix all =( temp \ all)
 
