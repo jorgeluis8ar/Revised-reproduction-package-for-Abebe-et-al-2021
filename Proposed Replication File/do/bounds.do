@@ -96,7 +96,7 @@ label var monthly_wage_imp50_gened "Mean control earnings +/- 0.5 SDs"
 label var monthly_wage_imp95 "95th / 5th percentile" 
 label var monthly_wage_manski "Max/min" 
 
-  itt_maker_onetreat  monthly_wage_pred  monthly_wage_pred_se25 monthly_wage_pred_se50  ///
+itt_maker_onetreat  monthly_wage_pred  monthly_wage_pred_se25 monthly_wage_pred_se50  ///
  monthly_wage_imp25_gened monthly_wage_imp50_gened monthly_wage_imp95   monthly_wage_manski, treat(tg_2)  ///
 covariates($balance bs_earnings) decimals(1) filename(table_a28)
 
@@ -170,8 +170,22 @@ use "data/attrition_bounds.dta",clear
 keep if time==2
 
 *Table A.33: Lee Bounds on binary variables in 2015.
-leebounds permanent_work tg_2   [pw=ed_weight] if control == 1 | tg_2 == 1  ,    cieffect 
-leebounds written_agreement tg_2   [pw=ed_weight] if control == 1 | tg_2 == 1  ,    cieffect 
+/*
+Following the analysis of attrition, the workshop treatment branch does affect attrition in the
+2018 endline. Thus, the authors now turn to provide evidence that all results are robust to attrition 
+in the data. For that purpose, they use treatment effect bounds for samples with non-random sample selection/attrition as proposed by Lee (2009). What the methodology supposes are extreme cases in the
+proportion of missing data. The key assumptions are:
+
+1. Random assignment of treatment
+2. Monotonicity
+
+The results are on two outcome variables; 1) permanent work and 2) formal work status. Each regression coefficients
+are estimated for both treatment branches. Regressions used frequency sampling weights and the code returns the 
+confidence interval for treatment effect. 
+*/
+
+leebounds permanent_work tg_2 [pw=ed_weight] if control == 1 | tg_2 == 1  ,    cieffect 
+leebounds written_agreement tg_2 [pw=ed_weight] if control == 1 | tg_2 == 1  ,    cieffect 
 
 leebounds permanent_work tg_1   [pw=ed_weight] if control == 1 | tg_1 == 1  ,    cieffect 
 leebounds written_agreement tg_1   [pw=ed_weight] if control == 1 | tg_1 == 1  ,    cieffect 
