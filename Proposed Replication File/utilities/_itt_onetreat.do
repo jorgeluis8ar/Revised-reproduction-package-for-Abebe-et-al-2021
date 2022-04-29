@@ -1,44 +1,43 @@
 
-	
+* Commented by: Jorge Luis Ochoa Rincón
 
 ********************************************************************************
 * Define a program to make ITT tables ******************************************
 ********************************************************************************
 
-	cap program drop itt_maker_onetreat
-	program define itt_maker_onetreat, rclass
+cap program drop itt_maker_onetreat
+program define itt_maker_onetreat, rclass
 		syntax varlist, TREAT(varlist)  COVARIATES(varlist) FILENAME(name) DECIMALS(integer) 
 		/* 
-			* varlist: local of dependent variables 
-			* treat1: the first binary treatment we are interest in
-			* treat2: the second binary treatment we are interest in
-			* covariates: local of control variables 
+			* varlist: local of dependent variables  --> One can acces this local by `varlist'
+			* treat: the first binary treatment we are interest in --> One can acces this local by `treat'
+			* covariates: local of control variables  --> One can acces this local by `covariates'
 			* gen: the name of the new matrix to be returned, stored in r(name)
 		*/	
 	
 		local dep_vars 	`varlist' // define local of dependent variables
-	
-		loc regressors `treat'  `covariates' // define local of regressors
- 		*/	
+		* The local of dep_vars takes into account all variable outcomes defined in the rows section
+		
+		local regressors `treat'  `covariates' // define local of regressors
+ 		* The local of regressors takes into account all right hand side variables of equation 1
 		
 		local dec `decimals'
 		cap drop  pval 
 		cap gen pval =.
 
-
 		* Initialize matrices **************************************************
-		mat control_mean	= J(`:word count `dep_vars'',1,.) // generate matrix
-		mat reg_count 		= J(`:word count `dep_vars'',1,.)
+		
+		mat control_mean	= J(`:word count `dep_vars'',1,.) // Matrix for column 1: Control mean
+		mat reg_count 		= J(`:word count `dep_vars'',1,.) // Matrix regression number of observations
 
-		mat reg1 			= J(`:word count `dep_vars'',2,.)
+		mat reg1 			= J(`:word count `dep_vars'',2,.) // Matrix for column 2 and 3: estimates of treatment branch
  
-		mat stars1 			= J(`:word count `dep_vars'',2,.)
+		mat stars1 			= J(`:word count `dep_vars'',2,.) // Matrix for legend of statistical significance
  
-		mat qvals 			= J(`:word count `dep_vars'',1,.)
-
-
+		mat qvals 			= J(`:word count `dep_vars'',1,.) // Matrix for linear hypotheses test
 
 		* Initializing row names. **********************************************
+		
 		mat rownames control_mean = `dep_vars'
 		mat colnames control_mean = "Control mean"
 	
@@ -48,39 +47,64 @@
 		mat rownames reg1 = `dep_vars'
 		mat colnames reg1 = "Coeff of Treatment" "SE" 
 	 
- 
-		/* 	Thist next bit constructs a list of the variable labels of the 
-			dependent variables labels. The way stata deals with lists of 
-			string is tricky, but this code works. I think I am tricking stata 
-			into enclosing an empty string with quotation marks. */
+		/*
 		
-		/* Defining the row names and the column names of the matrix */
-
+		The below loop will go trough every row of the established matrices (or simply the dependent variables).
+		Every step of the loop fills in the respective value in each of the matrices
+		
+		*/ 
 		loc i = 1
 		foreach y in `dep_vars'{ 
-		//	svy: reg `y' `regressors'  // run the regression
-		                   			*reg `y' `regressors' b_`y' , robust  
 
-		cap sum b_`y',d 
-		capture confirm variable b_`y'
-		if !_rc {
-               	reg `y'  `regressors'   [pw=ed_weight],   cluster(cluster_id) 
-				
-               }
-               else {
-               	reg `y'   `regressors'   [pw=ed_weight],   cluster(cluster_id) 
+			cap sum b_`y',d 
+			capture confirm variable b_`y'
+		
+			/*
+			The previuos line of code is an excellent way of telling stata to do two different things if the condition is
+			met. Thus, if the variable is the baseline outcome variable is in the data set, then run the regression model
+			taking the baseline outcome variable as a covariates. Conversly, if the condition is not met (e.g. the baseline
+			variable is not in the data set), then run the regression model without the baseline variable as covariate.
+			
+			IT REALLY IS A COOL WAY TO HANDLE THIS PROBLEM
+			*/
+			
+			if !_rc {
+				reg `y' `regressors' [pw=ed_weight], cluster(cluster_id) 
+            }
+            else {
+				reg `y' `regressors' [pw=ed_weight], cluster(cluster_id) 
+            }
 
-                }
-				
-			local p1 = (2 * ttail(e(df_r), abs(_b[`treat']/_se[`treat']))) 	// calculate p value for treatment 1
-			qui sum `y' if (`treat ' == 0  ) // define the control group
-	
+			/*
+			
+			Regression structure:
+			
+			The estimation to estimate is the following:
+			
+			Y_ic = β_0 + β_1 x treatment_{fic} + δ x X_{ic0} + μ_{ic}
+			
+			The elements of the regression are:
+				1. Dependent variable: 3hanges with every step of the loop. It is represented by the local `y'
+				2. Regressors: Defined as the covariates input in the program plus the a dummy variable if 
+				   an individual was ever assigned to treatment.
+				4. Regression weights: Given the sampling frequency of differente groups of the population
+				   to be represented in the study sample, inverse weights help to estimate the ITT according to
+				   the proportion of this subgroups in the sample. This is done by the option in brackets pw
+				5. Standard cluster errors: As the randomization of the sample and treatments was done in two steps.
+				   Firstly geographical zones and secondly within zones teatment randomization, the standar
+				   errors should be clustered to allow correlation within geographical zones of individuals.
+				   This is done by the option cluster(cluser_var)
+			*/
+			
 			* inputting values into the matrix piece by piece ******************
 
-			* control mean
+			* control mean -----------------------------------------------------
+			
+			qui sum `y' if (`treat ' == 0  ) // define the control group
 			mat control_mean[`i', 1] 	= r(mean)
 
-			* count of regression
+			* count of regression ----------------------------------------------
+			
 			mat reg_count[`i', 1] 		= e(N)
 
 			* P values and stars 
