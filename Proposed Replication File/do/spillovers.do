@@ -63,6 +63,18 @@ foreach group in spill treat {
 	}
 
 	ivreg2 `y' spill_* treat_* $balance bs_`y' [pw=ed_weight], partial($balance) cluster(cluster_id)
+	/*
+	
+	The previuos regression uses the command for Instrumental variables, but as it does no defines intruments,
+	the second first stage is not estimated and thus the command estimates a simple ols linear regression. So why 
+	do the author do that? The reason is because they are using the option partial. What this option does is that
+	it uses the Frisch-Waugh-Lovell (FWL) theorem and partials out the coefficients of the regression and the ones
+	that are kept still have the same standard error and point estimate.
+	
+	Finally, the regression estimates the spillover effects of the transport treatment on the treated by randomised
+	level of cluster saturation
+
+	*/
 	if "`group'"=="spill"{
 	test spill_20 = spill_40 = spill_75 =spill_90
 	local spill_fp = r(p)
