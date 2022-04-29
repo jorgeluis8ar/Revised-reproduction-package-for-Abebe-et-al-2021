@@ -1,3 +1,11 @@
+![GitHub commit activity](https://img.shields.io/github/commit-activity/m/jorgeluis8ar/Revised-reproduction-package-for-Abebe-et-al-2021)
+![GitHub commit activity (branch)](https://img.shields.io/github/commit-activity/w/jorgeluis8ar/Revised-reproduction-package-for-Abebe-et-al-2021/main)
+![GitHub contributors](https://img.shields.io/github/contributors/jorgeluis8ar/Revised-reproduction-package-for-Abebe-et-al-2021)
+![GitHub last commit](https://img.shields.io/github/last-commit/jorgeluis8ar/Revised-reproduction-package-for-Abebe-et-al-2021)
+![GitHub language count](https://img.shields.io/github/languages/count/jorgeluis8ar/Revised-reproduction-package-for-Abebe-et-al-2021)
+![GitHub top language](https://img.shields.io/github/languages/top/jorgeluis8ar/Revised-reproduction-package-for-Abebe-et-al-2021)
+![GitHub followers](https://img.shields.io/github/followers/jorgeluis8ar?style=social)
+
 # Abebe et al (2021) - Anonymity or Distance? Job Search and  Market Exclusion in a Growing African City
 
 This Repository holds a reproduction package for Abebe et al (2021)
