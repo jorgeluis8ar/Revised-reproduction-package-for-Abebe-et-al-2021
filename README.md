@@ -39,6 +39,8 @@ he task here is to improve documentation by adding comments to the code. You are
 #### Solution
 For this third deliverable I will be editing or commenting the existing code. To access the commit click on the comit's name. All commits are summarized in the following lists:
 
+* **[Initial commit](https://github.com/jorgeluis8ar/Revised-reproduction-package-for-Abebe-et-al-2021/commit/db2f73317a593a30509195413c5c7fff3020f6f0)** (db22f733): This is the initiation commmit for the repo.
+
 * **[main_end_line_results.do](https://github.com/jorgeluis8ar/Revised-reproduction-package-for-Abebe-et-al-2021/blob/main/Proposed%20Replication%20File/do/main_endline_results.do)**: This Do File calls programs from the [Utilities](https://github.com/jorgeluis8ar/Revised-reproduction-package-for-Abebe-et-al-2021/tree/main/Proposed%20Replication%20File/utilities) folder to make figures and tables using the end line results. This is the main script. The proposed changes or comments to the file are the following:
 
     + **[Changed lines of code for loops to create tables 5 and 6 and some organization](https://github.com/jorgeluis8ar/Revised-reproduction-package-for-Abebe-et-al-2021/commit/d5c11dcb7b29ba319e42c9d09c46756ca05923f4)** (tag: d5c11dc): This commit gives better organization to the Do File and creates a loop to create Tables 5 and 6. This tables were scattered over the Do File.
