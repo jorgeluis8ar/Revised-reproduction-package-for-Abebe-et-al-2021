@@ -56,15 +56,27 @@ local var3 "permanent_work2 long_tenure_uncond6"
 *replace jobtenure6 = jobtenure6/12
 **SF: I added this Mincerian regressions. 
 
-ivreg2 monthly_wage6   work2 hours_worked2 monthly_wage2 permanent_work2    [pw=ed_weight] if control==1 ,   cluster(cluster_id)
+ivreg2 monthly_wage6 work2 hours_worked2 monthly_wage2 permanent_work2  [pw=ed_weight] if control==1, cluster(cluster_id)
 outreg2  using "tables/table_a24.tex" , tex replace
-ivreg2 monthly_wage6   work2 hours_worked2 monthly_wage2 permanent_work2 long_tenure_uncond6   [pw=ed_weight] if control==1 ,   cluster(cluster_id)
+ivreg2 monthly_wage6 work2 hours_worked2 monthly_wage2 permanent_work2 long_tenure_uncond6   [pw=ed_weight] if control==1, cluster(cluster_id)
 outreg2  using "tables/table_a24.tex" , tex append
-ivreg2 monthly_wage6   work2 hours_worked2 monthly_wage2 permanent_work2  $balance [pw=ed_weight] if control==1 , partial($balance) cluster(cluster_id)
+ivreg2 monthly_wage6 work2 hours_worked2 monthly_wage2 permanent_work2 $balance [pw=ed_weight] if control==1, partial($balance) cluster(cluster_id)
 outreg2  using "tables/table_a24.tex" , tex append
-ivreg2 monthly_wage6   work2 hours_worked2 monthly_wage2 permanent_work2  long_tenure_uncond6 $balance [pw=ed_weight] if control==1 , partial($balance) cluster(cluster_id)
+ivreg2 monthly_wage6 work2 hours_worked2 monthly_wage2 permanent_work2 long_tenure_uncond6 $balance [pw=ed_weight] if control==1 , partial($balance) cluster(cluster_id)
 outreg2  using "tables/table_a24.tex" , tex append
 
+/*
+	
+	The previous regression uses the command for Instrumental variables, but as it does no defines intruments,
+	the second first stage is not estimated and thus the command estimates a simple ols linear regression. So why 
+	do the author do that? The reason is because they are using the option partial. What this option does is that
+	it uses the Frisch-Waugh-Lovell (FWL) theorem and partials out the coefficients of the regression and the ones
+	that are kept still have the same standard error and point estimate.
+	
+	Finally, the regression estimates the correlates of the 2018 wage earnings. The results show that having had a permanent
+	work by 2015 increases wage earning by sround 900 $. This effects is rather statistical significant.
+
+*/
   
 ivreg2 monthly_wage6   transport workshop bs_monthly_wage $balance  [pw=ed_weight]  , partial($balance ) cluster(cluster_id)
 matrix all = [_b[workshop], _b[workshop] + $ci*_se[workshop], _b[workshop] - $ci*_se[workshop]]
