@@ -225,8 +225,8 @@ program define itt_maker_jobs, rclass
 		
 		frmttable, statmat(control_mean) sdec(`dec') varlabels substat(1)
 		frmttable, statmat(reg_count) sdec(0) varlabels merge substat(1)
-		frmttable, statmat(reg1) sdec(`dec') annotate(stars1) asymbol(*,**,***) varlabels merge substat(1)
-		frmttable, statmat(reg2) sdec(`dec') annotate(stars2) asymbol(*,**,***) varlabels merge substat(1)
+		frmttable, statmat(reg1) sdec(`dec') annotate(stars1) asymbol(§,†,•) varlabels merge substat(1)
+		frmttable, statmat(reg2) sdec(`dec') annotate(stars2) asymbol(§,†,•) varlabels merge substat(1)
  		frmttable, statmat(cpval) sdec(3) varlabels merge substat(1)
  
 		/*

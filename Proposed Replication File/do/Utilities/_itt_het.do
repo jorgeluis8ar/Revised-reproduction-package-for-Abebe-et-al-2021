@@ -402,8 +402,8 @@ foreach h in 0 1{
 	if "`non'"!="non"{
 		frmttable, statmat(reg_count) sdec(0) varlabels substat(2)  merge 
 	}
-		frmttable, statmat(reg1) sdec(`dec'\   `dec' \  3) annotate(stars1) asymbol(*,**,***) varlabels merge substat(2)
-		frmttable, statmat(reg2)  sdec(`dec'\   `dec' \  3) annotate(stars2) asymbol(*,**,***) varlabels merge substat(2)
+		frmttable, statmat(reg1) sdec(`dec'\   `dec' \  3) annotate(stars1) asymbol(§,†,•) varlabels merge substat(2)
+		frmttable, statmat(reg2)  sdec(`dec'\   `dec' \  3) annotate(stars2) asymbol(§,†,•) varlabels merge substat(2)
 		
 		local merge merge
 	}

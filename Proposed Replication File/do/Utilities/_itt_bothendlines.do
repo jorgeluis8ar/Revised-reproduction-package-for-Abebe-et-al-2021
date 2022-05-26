@@ -292,8 +292,8 @@ foreach t in 2 6{
 		if "`non'"!="non"{
 			frmttable, statmat(reg_count) sdec(0) varlabels substat(2)  merge 
 			}
-			frmttable, statmat(reg1) sdec(3\3\3 \ 3\3\3 \ 3\3\3  ) annotate(stars1) asymbol(*,**,***) varlabels merge substat(2)
-			frmttable, statmat(reg2)  sdec(3\3\3 \ 3\3\3 \ 3\3\3  ) annotate(stars2) asymbol(*,**,***) varlabels merge substat(2)
+			frmttable, statmat(reg1) sdec(3\3\3 \ 3\3\3 \ 3\3\3  ) annotate(stars1) asymbol(§,†,•) varlabels merge substat(2)
+			frmttable, statmat(reg2)  sdec(3\3\3 \ 3\3\3 \ 3\3\3  ) annotate(stars2) asymbol(§,†,•) varlabels merge substat(2)
 		if "`cp'"=="cp"{
 			frmttable, statmat(cpval)   varlabels merge substat(2)
 		}
@@ -307,9 +307,9 @@ foreach t in 2 6{
 			varlabels ///
 			nocenter ///
 			replace ///
-			ctitle("", "2015", "", "", "", "2018", "", "", ""\ ///
+			ctitle("", "\textbf{2015}", "", "", "", "\textbf{2018}", "", "", ""\ ///
 			"\cmidrule(lr){2-5}\cmidrule(lr){6-9}", "Control", "", "{Transport}", "{Workshop}", "Control", "", "{Transport}", "{Workshop}"\ ///
-			"Outcome", "mean", "N", "", "","mean", "N", \ ///
+			"Variable", "mean", "N", "", "","mean", "N", \ ///
 			"", "(1)", "(2)", "(3)", "(4)", "(5)", "(6)", "(7)", "(8)") ///
 			multicol(1,2,4;1,6,4) 
 		}
@@ -321,9 +321,9 @@ foreach t in 2 6{
 			varlabels ///
 			nocenter ///
 			replace ///
-			ctitle("", "2015", "", "",  "2018", "", "", ""\ ///
+			ctitle("", "\textbf{2015}", "", "",  "\textbf{2018}", "", "", ""\ ///
 			"\cmidrule(lr){2-4}\cmidrule(lr){5-7}", "Control", "{Transport}", "{Workshop}", "Control",  "{Transport}", "{Workshop}"\ ///
-			"Outcome", "mean", "", "", "mean" \ ///
+			"Variable", "mean", "", "", "mean" \ ///
 			"", "(1)", "(2)", "(3)", "(4)", "(5)", "(6)") ///
 			multicol(1,2,3;1,5,3) 
 		}
@@ -335,9 +335,9 @@ foreach t in 2 6{
 			varlabels ///
 			nocenter ///
 			replace ///
-			ctitle("", "2015", "","", "",  "2018", "", "", "",""\ ///
+			ctitle("", "\textbf{2015}", "","", "",  "\textbf{2018}", "", "", "",""\ ///
 			"\cmidrule(lr){2-5}\cmidrule(lr){6-9}", "Control", "{Transport}", "{Workshop}","{Equality}", "Control",  "{Transport}", "{Workshop}" ,"{Equality}"\ ///
-			"Outcome", "mean", "", "", "(pval)", "mean", "", "", "(pval)" \ ///
+			"Variable", "mean", "", "", "(pval)", "mean", "", "", "(pval)" \ ///
 			"", "(1)", "(2)", "(3)", "(4)", "(5)", "(6)", "(7)", "(8)") ///
 			multicol(1,2,4;1,6,4) 
 

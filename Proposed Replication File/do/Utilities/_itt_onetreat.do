@@ -190,7 +190,7 @@ program define itt_maker_onetreat, rclass
 	 
 		* Merge matrices together to form larger matrix without N  -------------
 		frmttable, statmat(control_mean) sdec(`dec') varlabels
- 		frmttable, statmat(reg1) sdec(`dec')  annotate(stars1) asymbol(*,**,***)  varlabels merge //substat(1) 
+ 		frmttable, statmat(reg1) sdec(`dec')  annotate(stars1) asymbol(§,†,•)  varlabels merge //substat(1) 
 
 		frmttable using "results/tables/`filename'", 	///
 		tex ///
