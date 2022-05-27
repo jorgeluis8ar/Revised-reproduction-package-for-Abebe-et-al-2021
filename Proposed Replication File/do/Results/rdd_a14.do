@@ -1,6 +1,4 @@
 
-cd "/Users/jorgeochoa/OneDrive - Universidad de los andes/PEG/Urban Economics/Final Project/Github Repository/Revised-reproduction-package-for-Abebe-et-al-2021/Revised-reproduction-package-for-Abebe-et-al-2021/Proposed Replication File"
-
 use "data/endline_data.dta",replace
 
 keep if time==6

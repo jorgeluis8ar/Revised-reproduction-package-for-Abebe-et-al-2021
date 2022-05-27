@@ -181,7 +181,7 @@ program define itt_maker_onetreat, rclass
 		varlabels ///
 		nocenter ///
 		replace ///
-		ctitle("", "",   "{ ITT Estimate}", "", "" \ ///
+		ctitle("", "",   "{ Estimador de ITT}", "", "" \ ///
 		"", "Control",  " ", "",   "",   "Sharpened" \ ///
 		"Outcome", "mean", "N", "Coeff", "Std. Err." \ ///
 		"", "(1)", "(2)", "(3)", "(4)" ) ///

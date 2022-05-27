@@ -1,10 +1,6 @@
 * This do-file implements the Abadie et al estimator, as reported in 
 * Tables 4, 5 and 6.
  
- 
-cd "/Users/jorgeochoa/OneDrive - Universidad de los andes/PEG/Urban Economics/Final Project/Github Repository/Revised-reproduction-package-for-Abebe-et-al-2021/Revised-reproduction-package-for-Abebe-et-al-2021/Proposed Replication File"
-
- 
 set more off
 
 clear

@@ -1,5 +1,3 @@
-cd "/Users/jorgeochoa/OneDrive - Universidad de los andes/PEG/Urban Economics/Final Project/Github Repository/Revised-reproduction-package-for-Abebe-et-al-2021/Revised-reproduction-package-for-Abebe-et-al-2021/Proposed Replication File"
-
 
 clear
 window manage forward results
