@@ -23,6 +23,32 @@ The repository hosts all replication files for [Abebe et al (2021)](https://acad
 * **Original Replication Files**: Where all original replication files are hosted
 * **Proposed Replication File**: Where the class deliverable for the final project will be hosted.
 
+```
+Proposed Replication Files
+└─── data   
+│   │    attrition_bounds.dta
+│   │    endline_data.dta
+│   │    itt_other_studies.dta
+│   │    phone_panel.dta
+│   │    recall.dta
+└─── do
+│   └─── Results
+│       │   bounds.do
+│       │   comparison_other_studies.do
+│       │   complete_family_tables_a15_a23.do
+│       │   endogenous_stratification.do
+│       │   main_endline_results.do
+│       │   mediation_analysis.do
+│       │   premia.do
+│       │   rdd_a14.do
+│       │   spillovers.do
+│       │   trajectories.do
+│   └─── Results
+└───folder2
+    │   file021.txt
+    │   file022.txt
+```
+
 ***
 
 ### Deliverable 3
