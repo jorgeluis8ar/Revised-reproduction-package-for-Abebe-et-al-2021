@@ -1,0 +1,85 @@
+\ProvidesPackage{paquetes}
+%------------------------------------------------------------------
+%                   Paquetes básicos
+%------------------------------------------------------------------
+\usepackage[utf8]{inputenc}
+% \usepackage[spanish]{babel}
+% \usepackage[hidelinks]{hyperref}
+\usepackage[colorlinks=true,linkcolor=red,urlcolor=red,citecolor=red]{hyperref}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{multirow}
+\usepackage{soul}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{cancel}
+\usepackage{pdflscape}
+\usepackage{subfig}
+\usepackage{amssymb}
+\usepackage[flushleft]{threeparttable}
+\usepackage{enumitem}
+\usepackage{xfrac}
+\usepackage{longtable}
+\usepackage{adjustbox}
+\usepackage{tabularx}
+\usepackage{gensymb}%paquete para el símbolo de grados
+\setlength{\columnsep}{2.5cm}
+\setlength{\columnseprule}{3pt}
+\usepackage[table, svgnames, dvipsnames]{xcolor}
+\usepackage{makecell, cellspace, caption}
+\setlength\cellspacetoplimit{3pt}
+\setlength\cellspacebottomlimit{3pt}
+\usepackage{pdfpages}
+\usepackage{amsmath, amsthm,bm, amssymb}
+\usepackage{todonotes}
+\usepackage{ragged2e,array,url,csquotes,adjustbox,longtable}
+\usepackage{natbib}
+\bibliographystyle{apalike} 
+\usepackage{multicol} 
+\usepackage{tikz}
+\usepackage{float}
+\usepackage{import}
+% \renewcommand\spanishtablename{Tabla}
+% \setcounter{secnumdepth}{0} % Paquete para eliminar la numeración de las secciones
+
+\DeclareRobustCommand{\bbone}{\text{\usefont{U}{bbold}{m}{n}1}}
+\DeclareMathOperator{\EX}{\mathbb{E}}
+\newcommand{\indep}{\perp \!\!\! \perp}
+%------------------------------------------------------------------
+%                   Márgenes del documento
+%------------------------------------------------------------------
+
+% \usepackage[top=2cm, bottom=2cm, left=3.0cm, right=3.0cm]{geometry} % Wider
+% \usepackage[top=3cm, bottom=3cm, left=3.0cm, right=3.0cm]{geometry} % Mid margins
+\usepackage[top=4.5cm, bottom=4.5cm, left=3.5cm, right=3.5cm]{geometry} % Narrower
+
+%------------------------------------------------------------------
+%                   Encabezados del documento
+%------------------------------------------------------------------
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\setlength{\headheight}{15.2pt}
+\fancyhead[EOL]{\bfseries Urban Economics \\ Ignacio Sarmiento Barbieri}
+\fancyhead[EOR]{\bfseries Final Deliverable \\ May 29th, 2022}
+\fancyhead[EOC]{}
+
+
+\fancyfoot[EOC]{Page \thepage}
+
+%------------------------------------------------------------------
+%                   Agregando características de las tablas
+%------------------------------------------------------------------
+\newcolumntype{L}[1]{>{\raggedright\let\newline\\\arraybackslash\hspace{0pt}}m{#1}}
+\newcolumntype{C}[1]{>{\centering\let\newline\\\arraybackslash\hspace{0pt}}m{#1}}
+\newcolumntype{R}[1]{>{\raggedleft\let\newline\\\arraybackslash\hspace{0pt}}m{#1}}
+\newcommand{\notindep}{\not\!\perp\!\!\! \perp}
+%------------------------------------------------------------------
+%                   Nombres autores
+%------------------------------------------------------------------
+% \title{Econometría avanzada \\ Propuesta de investigación}
+\title{\textbf{Reproduction assessment for \\ Anonymity or Distance? Job Search \\ And Labour Market Exclusion in a Growing \\ African City}}
+
+\author{Jorge Luis Ochoa Rincón\footnote{Student ID: \texttt{201711018}; 
+e-mail: \href{mailto:jl.ochoa@uniandes.edu.co}{\texttt{jl.ochoa@uniandes.edu.com}}.}}
+% \date{\today}
+\date{}

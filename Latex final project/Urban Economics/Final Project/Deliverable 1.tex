@@ -1,0 +1,73 @@
+\documentclass{article}
+\usepackage{paquetes}
+
+\begin{document}
+
+\maketitle
+
+\section{Seleccionando un Paper} \label{Selecting}
+
+El trabajo que voy a desarrollar durante el semestre es \cite{abebe2021anonymity}. El trabajo no presenta ningún registro de reproducción en \href{https://www.socialsciencereproduction.org/}{socialsciencereproduction.org}.
+
+
+\section{Examinando el Paper} \label{Scoping}
+    \subsection{Resumen}
+    
+    \noindent El trabajo maneja 2 preguntas de investigación. La primera es ¿Cuál es el efecto sobre variables del mercado laboral de políticas que reducen fricciones en este?. La segunda indaga sobre el diseño muestral del modelo. ¿Tiene un impacto mayor una intervención diseñada a mejorar las capacidades de señalización de las personas o un subsidio de transporte que reduzca los costos de buscar trabajo? Para poder brindar una respuesta causal a sus preguntas los autores utilizan variación experimental obtenida de un RCT desarrollado en la ciudad de Addis Ababa, Etiopía.
+    
+    \medskip
+    
+    Los autores basan su análisis partiendo de la siguiente pregunta: ¿Porqué los jóvenes presentan resultados detrimentales en el mercado laboral? Para responder esta pregunta de investigación, los autores identifican dos principales fricciones del mercado: costos asociados a la búsqueda de trabajo e inhabilidad de señalar fortalezas en el mercado laboral. Basados en un diseño experimental, los autores implementan dos intervenciones en la población objetivo. La primera es un subsidio de transporte que permite realizar 3 viajes en el Sistema de Transporte Público (STP) a la semana. La segunda intervención es un taller enfocado en adoptar mejores prácticas en la aplicación de trabajo. Dado el diseño experimental del programa, los resultados presentados identifican un efecto causal en la población perteneciente al estudio. Esta población se encuentra caracterizada por individuos i) entre 18 y 29 años de edad, ii) culminaron sus estudios de bachillerato, iii) estaban dispuestos a comenzar a trabajar en los próximos 3 meses y iv) no se encontraban trabajando o eran estudiantes de tiempo completo. El estudio cuenta con 3.052 individuos. La fuente principal de datos del trabajo son los datos recogidos por parte del experimento; linea de base, encuestas de seguimiento y linea de cierre.
+    
+    \medskip
+    
+    Partiendo de un marco conceptual teórico, el trabajo realiza 4 principales predicciones sobre las relaciones presentes en los datos:
+    
+    \begin{enumerate}
+    
+        \item Efecto en empleo formal: Ambas intervenciones aumentaran la tasa de empleo en trabajos formales. Sin embargo, este efecto se disipará después de la culminación del tratamiento.
+        
+        \item intensidad y eficiencia de búsqueda: La intervención de costos de transporte aumenta el número de vacantes visualizadas. Por otro lado la intervención del taller de empleabilidad aumenta la probabilidad de conseguir un trabajo después de encontrar la vacante. 
+        
+        \item Calidad del emparejamiento empleado-firma: El taller de empleabilidad genera un aumento persistente de la calidad del emparejamiento: la intervención de transporte no.
+        
+        \item Efectos heterogéneos: El impacto del intervención del taller de empleabilidad es mayor para los individuos con características observables desfavorables.
+        
+    \end{enumerate}
+    
+    \noindent Con el fin de poder responder las preguntas de investigación, el trabajo desarrolla dos metodologías. La primera utiliza un modelo de MCO para estimar los efectos causales de las intervenciones en los resultados del mercado laboral de las personas. La segunda, utiliza un modelo de diferencias en diferencias dinámico utilizando información de uso efectivo de las intervenciones.
+    
+    
+    \medskip
+    
+    Efectos linea de cierre:
+    
+    \begin{equation}
+        y_{ic} = \beta_0 + \sum_{f}\left[\beta_f\times \text{treat}_{fic} + \gamma_f\times\text{spillover}_{fic}\right] +\alpha \times y_{ic,\text{pre}} + \delta\times \mathbf{x}_{ic0} + \mu_{ic} \label{eq:main}
+    \end{equation}
+    
+    Efectos en periodos de seguimiento:
+    
+    \begin{equation}
+        y_{itc} = \sum_{f} \sum_{w=S_f}^{E_f}\left[\beta_{fw}\times\text{treat}_{fic}\times d_{wit}+\gamma_{fw}\times\text{spillover}_{fic}\times d_{wit}\right] + \alpha_t\times y_{itc,\text{pre}} + \delta\times\mathbf{x}_{ic0} + \eta_t + \mu_{itc} \label{eq:second}
+    \end{equation}
+
+    Los resultados y conclusiones principales del trabajo se presentan bajo la especificación presentada en \ref{eq:main}. Las conclusiones primeras se pueden dividir en efectos de corto y largo plazo. En el corto plazo las intervenciones no logran generar efectos sobre las probabilidad de conseguir empleo formal. Sin embargo, la probabilidad de conseguir un empleo temporal aumenta en 60\% comparado con el grupo de control. Por el contrario, los resultados de corto plazo muestran un aumento significativo en los ingresos salariales por la intervención del taller de empleabilidad. Resultados adicionales muestran que los efectos del taller de empleabilidad perduran 4 años en el tiempo, mientras que los efectos de la intervención de transporte se disipan rápidamente. De igual forma, estos resultados adicionales muestran, como era de esperar, el cumplimiento de las predicciones propuestas. Los autores realizan pruebas de robustez para comprobar los resultados obtenidos. Dentro de estas se evidencia la corrección por múltiples comparaciones, aplicando una transformación logarítmica a las variables dependientes (las que aplica), winsorizando en la parte superior de la distribución, regresiones por quintiles, diferentes supuestos sobre la pérdida de información y diferentes ejercicios de límites superiores e inferiores con el uso de Lee Bounds. Por último, el trabajo cuenta con un total de 11 elementos. Estos se componen de 5 figuras y 6 tablas.
+    
+    \subsection{Reproducción Inicial}
+    Para la reproducción inicial se presentan las estimaciones de la especificación en \ref{eq:main}. Los resultados originales del trabajo se muestran en la Figura \ref{fig:a}, mientras que los resultados replicados se muestran en la Figura \ref{fig:b}. El cambio realizado se encuentra en la primera columna de esta última gráfica, donde se cambia el nombre de la columna. Estos resultados presentados ayudan a comprobar todas las predicciones propuestas en el trabajo. Específicamente, se analizará "la calidad del emparejamiento empleado firma". Como es expuesto anteriormente, el marco conceptual teórico planteado ayuda a predecir que la intervención del taller de empleabilidad genera un aumento persistente en la calidad del emparejamiento. Este emparejamiento, en el largo plazo, aumenta el diferencial en salarios entre los grupos de control y tratamiento. Adicionalmente, la predicción del modelo indica que los efectos de largo plazo de los salarios son nulos en la intervención de transporte. Confirmando empíricamente esta predicción, se utiliza las columnas 6 y 7 de las figuras \ref{fig:a} y \ref{fig:b}. Se encuentran coeficientes de 30.916 y 299.469 para las intervenciones de transporte y taller de empleabilidad respectivamente. Dados los errores estándar reportados, el efecto es significativo únicamente para la intervención del taller de empleabilidad. Confirmando así la predicción. Este efecto, comparado frente al grupo de control, muestra un aumento de 25\% en los salarios cuatro años después de la intervención.
+    
+    \begin{figure}
+        \centering
+        \subfloat[Tabla Original\label{fig:a}]{\includegraphics[width=15cm,height=9cm]{Imagenes/Figura paper.png}}\qquad
+        \subfloat[Reproducción\label{fig:b}]{\includegraphics[width=15cm,height=9cm]{Imagenes/Figura propia.png}}
+    \end{figure}
+    
+    \subsection{Paquete de reproducción}
+    
+    El repositorio de la reproducción del trabajo puede encontrarse a continuación:  \href{https://github.com/jorgeluis8ar/Revised-reproduction-package-for-Abebe-et-al-2021}{Link del repositorio}.
+    
+\newpage
+
+\bibliography{Referencia.bib}
+\end{document}

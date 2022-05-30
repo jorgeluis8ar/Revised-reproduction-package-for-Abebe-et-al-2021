@@ -1,0 +1,144 @@
+\documentclass{article}
+\usepackage{paquetes}
+
+\begin{document}
+
+\maketitle
+
+\section{Description of the inputs}
+
+\subsection{Description of the data sources and raw data} \label{description data}
+
+
+The reproduction package for the paper I chose (\cite{abebe2021anonymity}) comes with the following structure:
+
+\begin{itemize}
+    \item Data
+    \item Do Files
+    \item Figures
+    \item Tables
+    \item Utilities
+\end{itemize}
+
+Where the first folder contains cleaned data ready to be analyzed.The Do Files folder contains all the do files to reproduce tables and figures in the paper.The figures and tables folders contain all the figures in png and pdf formats and tables in text and thml format. The utilities folder contains all programs (all analyses are done in \texttt{STATA}) created to format tables in tex and html format. Table \ref{tab:D2 table 1} shows the description off all the data used to replicate the results outlined in the paper and some data sources mentioned but not provided. Given that the paper selected uses an RCT to evaluate the research questions I divide the data in two sections: 1) those related to the experimental design and ) those non experimental related. In terms of data cited, most of the data is explicitly cited in the paper or online annex. Data in Panel A documents is not provided, but all data in Panel B is provided and efficiently named and stored.
+
+\begin{table}[h!]
+      \centering
+      \caption{Description of data sources and raw data}
+      \scalebox{0.90}{
+        \begin{tabular}{lccccc}
+        \hline
+        \hline
+        \multicolumn{1}{c}{Data.Source} & Page & Data.Files & Location & Provided & Cited \\
+        \hline
+        \multicolumn{6}{l}{Panel A. Non-Experimental Data} \\
+        \hline
+        2013 Labour Force Survey - Addis Ababa & 12 & Not available & Not available & False & True \\
+        Ethiopian Central Agency (CSA) enumeration areas & 11 & Not available & Not available & False & True \\
+        Jobs locations & A1 - 2 & Not available & Not available & False & True \\
+        \hline
+        \multicolumn{6}{l}{Panel B. Experimental Data} \\
+        \hline
+        Attrition bounds & - & attrition\_bounds.dta & data/ & True & False \\
+        End line data & 12 & endline\_data.dta & data/ & True & True \\
+        Itt other studies & 28 & itt\_other\_studies.dta & data/ & True & True \\
+        Phone panel & 12 & phone\_panel.dta & data/ & True & True \\
+        Recall & 12 & recall.dta & data/ & True & True \\
+        \hline
+        \hline
+        \end{tabular}}
+      \label{tab:D2 table 1}
+    \end{table}
+
+\subsection{Description of the analytic data} \label{description analytic data}
+
+All the data sources provided in the complementary file are described in Table \ref{tab:D2 table 2}. The table describes all data provided. For each data set I set a brief description of the use of the data in the research process. The most important source of information comes from the ``endline\_data.dta'' base, where most of the figures and tables are product of.
+
+\begin{table}[h!]
+      \centering
+      \caption{Description of the analytic data}
+      \scalebox{0.9}{
+        \begin{tabular}{lcl}
+        \hline
+        \hline
+        \multicolumn{1}{c}{Analytic.Data} & Location & \multicolumn{1}{c}{Description} \\
+        \hline
+        \multirow{2}[1]{*}{attrition\_bounds.dta} & \multirow{2}[1]{*}{data/} & Data for table a8 \\
+          &   & Data for table a27 - a33 \\
+        \multirow{14}[0]{*}{endline\_data.dta} & \multirow{14}[0]{*}{data/} & Data for tables a15-a23 \\
+          &   & Data for tables 4 - 6 \\
+          &   & Data for table AbadieFirstStage.tex \\
+          &   & Data for tables 2 -6 \\
+          &   & Data for tables a9 - a15 \\
+          &   & Data for table a25 \\
+          &   & Data for figure 3 \\
+          &   & Data for figure a3, a8, a4, a5 \\
+          &   & Data for table a24 \\
+          &   & Data for figure 4 \\
+          &   & Data for table a24 \\
+          &   & Data for table a26 \\
+          &   & Data for table a14 \\
+          &   & Data for table a35, a36 and a34 \\
+        \multirow{2}[0]{*}{itt\_other\_studies.dta} & \multirow{2}[0]{*}{data/} & Data for figure 5a \\
+          &   & Data for figure 5b \\
+        \multirow{2}[0]{*}{phone\_panel.dta} & \multirow{2}[0]{*}{data/} & Data for figures 1, 2 \\
+          &   & Data for figrues a6, a7 \\
+        recall.dta & data/ & Complementary data for figures a4, a5 \\
+        \hline
+        \hline
+        \end{tabular}}
+      \label{tab:D2 table 2}
+    \end{table}
+
+\subsection{Description of the code scripts} \label{description codes}
+
+As mentioned in Section \ref{description data}, all the replication files are in \texttt{STATA}. Table \ref{tab:D2 table 3} reports all the Do Files to reproduce the results of the paper. In the inputs column, I describe data sources and Do files - ado files - called upon in the original script. As column 6 documents, most of the Do files provided are used to analyze the data. Just three files are used to clean some data, but still the cleaning process takes a trivial proportion. This is in line with previous comments on the data: the data provided is not raw data, but processed data ready to be analyzed.
+
+\section{Assign a reproducibility score}
+
+The reproduction package in all is organized in a proficient way. All tables and figures are well documented in the Do Files and names are designed accordingly to results in the paper. But, there is still room for improvement. First, the main problem comes from understanding all the programs and ado files needed to run the scripts. Given that some packages are hard to find for \texttt{STATA} implementations, when trying to run all Do Files, there are several errors. This leads to inefficiency in terms of time used for understanding the structure. One possible solution is to create a Do file with all the installation commands for all the programs and functions needed for the analysis. Second, some Do Files called upon each other several times. This dynamic leads to uncertainty which data sets are used (could no make all the data connections allowed), so final conclusions on what data produces which figure or table does no have 100 \% accuracy. One solution would be to create a Do File with all the needed functions, program needed a just call a single data set and Do File to be sure what produces what. This caveats seem small, compared to the scale of the research project, but since there is room for improvement, I can not give a perfect score. Another small issue is that results in the corresponding tables are not a 100 percent identical.
+
+\medskip
+
+Described my comments, I can now score the reproduction package for display items. Given the size of the display items is remarkable, and that figures and tables are basically produced by the same commands, I decide to give an overall score to the reproduction package and not item by item. The score I give for the reproduction package of \cite{abebe2021anonymity} is 9 (L9). The reasons are explained above and given the space for improvement, a perfect score is not on the table.
+
+\bibliography{Referencia.bib}
+
+\begin{landscape}
+
+\begin{table}[h!]
+  \centering
+  \caption{Description of the code}
+  \scalebox{0.7}{
+    \begin{tabular}{lllL{5cm}C{3cm}c}
+    \hline
+    \hline
+    File\_name & location & Inputs & Outputs&description & primary\_type \\
+    \hline
+    \multirow{2}[1]{*}{bounds.do} & \multirow{2}[1]{*}{do/bounds.do} & attrition\_bounds.dta & Table a8, Table a28, Table a27, table a29, table a30, table a31, table a32, table a33 & Produces all tables  & \multirow{2}[1]{*}{analysis} \\
+      &   & utilities/\_itt\_onetreat.do &   & in the outputs column &  \\
+    \multirow{2}[0]{*}{comparison\_other\_studies.do} & \multirow{2}[0]{*}{do/comparison\_other\_studies.do} & itt\_other\_studies.dta & Figure 5a, Figure 5b & \multirow{2}[0]{*}{Produces graphs} & \multirow{2}[0]{*}{analysis} \\
+      &   & utilities/dataout.ado &   & &  \\
+    \multirow{4}[0]{*}{complete\_family\_tables\_a15\_a23.do} & \multirow{4}[0]{*}{do/complete\_family\_tables\_a15\_a23.do} & endline\_data.dta & Table a15, Table a16, Table a17, Table a18, Table a19, Table a20, Table a21, Table a22, Table a23 & \multirow{4}[0]{*}{Produces tables} & \multirow{4}[0]{*}{analysis} \\
+      &   & utilities/\_itt\_bothendlines.do &   & &  \\
+      &   & utilities/\_itt\_onenedline.do &   &  &  \\
+      &   & utilities/\_itt\_het.do &   &  &  \\
+    endogenous\_stratification.do & do/endogenous\_stratification.do & endline\_data.dta & Table 4, Table 5, Table 6, AbadieFirstStage.tex & Produces tables abadie and complements for tables 4 to 6 & analysis and cleaning \\
+    \multirow{4}[0]{*}{main\_endline\_results.do} & \multirow{4}[0]{*}{do/main\_endline\_results.do} & endline\_data.dta & Table 2, Table 3, Table 4, Table 5, Table 6, Table a9, Table a10, Table a11, Table a12, Table a13, Table a14, Table a15, Table a25, Figure 3, Figure a3, Figure a8, figure a4, figure a5 & Produces tables and & \multirow{4}[0]{*}{analysis} \\
+      &   & recall.dta &   &figures in &  \\
+      &   & utilities/\_DefineQuadraticConstraintProgram &   & outputs   &  \\
+      &   & utilities/\_DefineQuadraticConstraintProgram\_monthly" &   &column &  \\
+    mediation\_analysis.do & do/mediation\_analysis.do & endline\_data.dta & Figure a24, Figure 4, table a24 & Produces tables and figures in outputs column & analysis \\
+    premia.do & do/premia.do & endline\_data.dta & Table a26 & Loads, cleans and produces tables & cleaning and analysis \\
+    rdd\_a14.do & do/rdd\_a14.do & endline\_data.dta & Table a14 & Loads, cleans and produces tables & cleaning and analysis \\
+    spillovers.do & do/spillovers.do & endline\_data.dta & table a35, table a36, table a34 & Produces tables & analysis \\
+    trajectories.do & do/trajectories.do & phone\_panel.dta & Figure 1, Figure 2, Figure a6, table a7 & Produces tables and figures in outputs column & analysis \\
+    \hline
+    \hline
+    \end{tabular}}
+  \label{tab:D2 table 3}
+\end{table}
+
+\end{landscape}
+
+\end{document}
