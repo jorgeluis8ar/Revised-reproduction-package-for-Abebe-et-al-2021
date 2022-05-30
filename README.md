@@ -21,7 +21,45 @@ This Repository holds a reproduction package for Abebe et al (2021)
 The repository hosts all replication files for [Abebe et al (2021)](https://academic.oup.com/restud/article-abstract/88/3/1279/5912023) for the [Urban Economics](https://ignaciomsarmiento.github.io/teaching/Urban/2022/Urban.html) class at Universidad de los Andes. All replication files , giving the class purpose, are divided into two folders.
 
 * **Original Replication Files**: Where all original replication files are hosted
-* **Proposed Replication File**: Where the class deliverable for the final project will be hosted.
+
+
+```
+Original Replication Files
+└─── data   
+│   │    attrition_bounds.dta
+│   │    endline_data.dta
+│   │    itt_other_studies.dta
+│   │    phone_panel.dta
+│   │    recall.dta
+└─── do
+│   │   bounds.do
+│   │   comparison_other_studies.do
+│   │   complete_family_tables_a15_a23.do
+│   │   endogenous_stratification.do
+│   │   main_endline_results.do
+│   │   mediation_analysis.do
+│   │   premia.do
+│   │   rdd_a14.do
+│   │   spillovers.do
+│   │   trajectories.do
+└─── utilities
+│   │   _attrition_tables.do
+│   │   _DefineQuadraticConstraintProgram_monthly.do
+│   │   _DefineQuadraticConstraintProgram.do
+│   │   _itt_bothendlines.do
+│   │   _itt_het.do
+│   │   _itt_oneendline.do
+│   │   _itt_onetreat.do
+│   │   dataout.ado
+│   │   dataout.sthlp
+└─── figures
+│       │   All figures in the main paper and the appendix
+└─── tables
+│       │   All tables in the main paper and the appendix
+```
+
+
+* **Proposed Replication Files**: Where the class deliverable for the final project will be hosted.
 
 ```
 Proposed Replication Files
@@ -43,10 +81,21 @@ Proposed Replication Files
 │       │   rdd_a14.do
 │       │   spillovers.do
 │       │   trajectories.do
-│   └─── Results
-└───folder2
-    │   file021.txt
-    │   file022.txt
+│   └─── Utilities
+│       │   _attrition_tables.do
+│       │   _DefineQuadraticConstraintProgram_monthly.do
+│       │   _DefineQuadraticConstraintProgram.do
+│       │   _itt_bothendlines.do
+│       │   _itt_het.do
+│       │   _itt_oneendline.do
+│       │   _itt_onetreat.do
+│       │   dataout.ado
+│       │   dataout.sthlp
+└─── results
+│   └─── figures
+│       │   All figures in the main paper and the appendix
+│   └─── tables
+│       │   All tables in the main paper and the appendix
 ```
 
 ***
