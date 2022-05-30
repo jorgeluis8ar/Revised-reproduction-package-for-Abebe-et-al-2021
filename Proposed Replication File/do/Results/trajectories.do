@@ -194,14 +194,14 @@ drop mean_`outcome'
 					local second_date 8
 				}
 
-			twoway	(rarea SQ_cit_`g' SQ_cib_`g' SQ_treat_w if SQ_treat_w>-8, color(gs15)   ) ///
-					(line  SQ_cit_`g' SQ_treat_w if SQ_treat_w>-8, lpattern(dash) color(gs10)) /// 
-					(line  SQ_cib_`g' SQ_treat_w if SQ_treat_w>-8, lpattern(dash) color(gs10)) /// 
-					(line  SQ_te_`g' treat_w, color(gs1)) ///
+			twoway	(rarea SQ_cit_`g' SQ_cib_`g' SQ_treat_w if SQ_treat_w>-8, color(dkblue%50)   ) ///
+					(line  SQ_cit_`g' SQ_treat_w if SQ_treat_w>-8, lpattern(dash) color(green)) /// 
+					(line  SQ_cib_`g' SQ_treat_w if SQ_treat_w>-8, lpattern(dash) color(green)) /// 
+					(line  SQ_te_`g' treat_w, color(gold)) ///
 					(rcap cit_`g' cib_`g' treat_w if treat_w>-8, xmtick(-7/14) xlabel(-7/14) xtitle(Fortnight)) ///
 					(scatter  te_`g' treat_w,  $bounding ///
-								xline(`second_date', lcolor(orange) lpattern(dash)) ///
-								xline(0, lcolor(green) lpattern(dash))  ///
+								xline(`second_date', lcolor(magenta) lpattern(dash)) ///
+								xline(0, lcolor(cyan) lpattern(dash))  ///
 								plotregion(fcolor(white) lcolor(white)) ///
 								graphregion(fcolor(white) lcolor(white)) ///
 								legend(off)) 	(line  flat treat_w if treat_w>-8, color(gs5))  ,   yline(0, lcolor(gs5) ) 	ytitle("Effect on `outcomelabel'") 

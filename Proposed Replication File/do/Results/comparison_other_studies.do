@@ -28,8 +28,8 @@ sort rb
 ge z = _n
 ge ad = (transport ==1 | workshop ==1)
 
-twoway (bar rb z if z<= 13 & workshop == 1, msize(*1.2) pstyle(p2) fcolor(red) fi(inten30)   )  ///
-	(bar rb z if z<= 13 & transport == 1, msize(*1.2) pstyle(p3) fcolor(green) fi(inten30)   )  ///
+twoway (bar rb z if z<= 13 & workshop == 1, msize(*1.2) pstyle(p2) fcolor(blue) fi(inten30)   )  ///
+	(bar rb z if z<= 13 & transport == 1, msize(*1.2) pstyle(p3) fcolor(gold) fi(inten30)   )  ///
 	(bar rb z if z<= 13 & ad ==0, pstyle(p1)  fcolor(white) ) ///
 	(rcap rb_UB rb_UB z if z<= 13 & ad == 0, pstyle(p1) ) ///
 	(rcap rb_LB rb_LB z if z<= 13 & ad == 0, pstyle(p1) ) ///
@@ -60,8 +60,8 @@ sort cb
 ge z = _n
 
  
- twoway (bar cb z if  workshop ==1, pstyle(p2) msize(*1.2) fcolor(red) fi(inten30) ) ///
- (bar cb z if  transport ==1, pstyle(p3) msize(*1.2) fcolor(green) fi(inten30) ) ///
+ twoway (bar cb z if  workshop ==1, pstyle(p2) msize(*1.2) fcolor(blue) fi(inten30) ) ///
+ (bar cb z if  transport ==1, pstyle(p3) msize(*1.2) fcolor(gold) fi(inten30) ) ///
  (bar cb z if  ad ==0, pstyle(p1)  fcolor(white)  )  ///
  (rcap cb_UB cb_UB z if   ad == 0, pstyle(p1) ) ///
 	(rcap cb_LB cb_LB z if ad == 0, pstyle(p1) ) ///

@@ -333,8 +333,8 @@ foreach v in 1 2 5 {
 twoway (line cumul_earn5 monthly_wage if treat_groupind ==5, sort) ///
        (line cumul_earn2 monthly_wage if treat_groupind ==2, sort) , ///
 		legend (label(1 "Control") label(2 "Workshop")) ///
-		ytitle("Cumulative percent")  ///
-		graphr(fc(white) lc(white)) graphregion(margin(l+5 r+5)) ///
+		ytitle("Cumulative percent")  ylab(,nogrid) ///
+		graphr(fc(white) lc(white)) graphregion(margin(l+5 r+5) color(maroon%10)) ///
 		xtitle("Earnings", margin(medium)) 
 *graph save  "01 Paper/Figures/Second_endline/Dominance.gph" , replace
 
@@ -344,11 +344,11 @@ graph export "results/figures/figure1.png", replace width(1600) height(1200)
 twoway (line cumul_earn5 monthly_wage if treat_groupind ==5, sort) ///
        (line cumul_earn1 monthly_wage if treat_groupind ==1, sort) , ///
        legend (label(1 "Control") label(2 "Transport")) ///
-       ytitle("Cumulative percent")  ///
+       ytitle("Cumulative percent") ylab(,nogrid)  ///
        graphr(fc(white) lc(white)) graphregion(margin(l+5 r+5)) ///
        xtitle("Earnings", margin(medium)) 
  *  graph save  "figures/Figures/Second_endline/Dominance_transport.gph" , replace
-	graph export "results/figures/figure_a3.png", replace width(1600) height(1200)
+	*graph export "results/figures/figure_a3.png", replace width(1600) height(1200)
 	
 restore
 
